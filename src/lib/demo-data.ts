@@ -1,0 +1,148 @@
+import type { Customer, Invoice } from "@/lib/types";
+
+function toIsoDate(offsetDays: number) {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString();
+}
+
+export function getDemoCustomers(): Customer[] {
+  return [
+    {
+      id: 101,
+      firstname: "Mina",
+      lastname: "Tran",
+      fullname: "Mina Tran",
+      business_name: "North Studio",
+      business_then_name: "North Studio",
+      email: "mina@northstudio.example",
+      phone: "+84 28 5555 0191",
+      mobile: "+84 90 010 0191",
+      created_at: toIsoDate(-4),
+      updated_at: toIsoDate(-1),
+      no_email: false,
+      properties: { lifecycle_segment: "VIP" },
+      contacts: [{ email: "mina@northstudio.example" }],
+    },
+    {
+      id: 102,
+      firstname: "Alex",
+      lastname: "Nguyen",
+      fullname: "Alex Nguyen",
+      business_name: "Atlas Repairs",
+      business_then_name: "Atlas Repairs",
+      email: "alex@atlasrepairs.example",
+      phone: "+84 28 5555 0251",
+      mobile: null,
+      created_at: toIsoDate(-12),
+      updated_at: toIsoDate(-3),
+      no_email: false,
+      properties: { lifecycle_segment: "Active" },
+      contacts: [{ email: "alex@atlasrepairs.example" }],
+    },
+    {
+      id: 103,
+      firstname: "Sara",
+      lastname: "Do",
+      fullname: "Sara Do",
+      business_name: "Harbor & Finch",
+      business_then_name: "Harbor & Finch",
+      email: "billing@harborfinch.example",
+      phone: "+84 28 5555 0405",
+      mobile: null,
+      created_at: toIsoDate(-18),
+      updated_at: toIsoDate(-2),
+      no_email: false,
+      properties: { lifecycle_segment: "Collections" },
+      contacts: [{ email: "billing@harborfinch.example" }],
+    },
+  ];
+}
+
+export function getDemoInvoices(): Invoice[] {
+  const customers = getDemoCustomers();
+
+  return [
+    {
+      id: 9001,
+      customer_id: 101,
+      customer_business_then_name: "North Studio",
+      number: "INV-9001",
+      created_at: toIsoDate(-7),
+      updated_at: toIsoDate(-1),
+      date: toIsoDate(-7),
+      due_date: toIsoDate(0),
+      total: "3200.00",
+      subtotal: "3200.00",
+      tax: "0.00",
+      pdf_url: null,
+      is_paid: false,
+      customer: customers[0],
+    },
+    {
+      id: 9002,
+      customer_id: 102,
+      customer_business_then_name: "Atlas Repairs",
+      number: "INV-9002",
+      created_at: toIsoDate(-10),
+      updated_at: toIsoDate(-2),
+      date: toIsoDate(-10),
+      due_date: toIsoDate(-3),
+      total: "5400.00",
+      subtotal: "5400.00",
+      tax: "0.00",
+      pdf_url: null,
+      is_paid: false,
+      customer: customers[1],
+    },
+    {
+      id: 9003,
+      customer_id: 103,
+      customer_business_then_name: "Harbor & Finch",
+      number: "INV-9003",
+      created_at: toIsoDate(-20),
+      updated_at: toIsoDate(-2),
+      date: toIsoDate(-20),
+      due_date: toIsoDate(-8),
+      total: "11750.00",
+      subtotal: "11750.00",
+      tax: "0.00",
+      pdf_url: null,
+      is_paid: false,
+      customer: customers[2],
+    },
+    {
+      id: 9004,
+      customer_id: 103,
+      customer_business_then_name: "Harbor & Finch",
+      number: "INV-9004",
+      created_at: toIsoDate(-28),
+      updated_at: toIsoDate(-5),
+      date: toIsoDate(-28),
+      due_date: toIsoDate(-16),
+      total: "21800.00",
+      subtotal: "21800.00",
+      tax: "0.00",
+      pdf_url: null,
+      is_paid: false,
+      customer: customers[2],
+    },
+    {
+      id: 9005,
+      customer_id: 102,
+      customer_business_then_name: "Atlas Repairs",
+      number: "INV-9005",
+      created_at: toIsoDate(-5),
+      updated_at: toIsoDate(-1),
+      date: toIsoDate(-5),
+      due_date: toIsoDate(4),
+      total: "1800.00",
+      subtotal: "1800.00",
+      tax: "0.00",
+      pdf_url: null,
+      is_paid: false,
+      customer: customers[1],
+    },
+  ];
+}
