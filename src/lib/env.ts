@@ -22,8 +22,6 @@ export function getAppConfig() {
     smtpUser,
     smtpPass,
     smtpFrom: readString(process.env.SMTP_FROM),
-    basicAuthUser: readString(process.env.APP_BASIC_AUTH_USER),
-    basicAuthPassword: readString(process.env.APP_BASIC_AUTH_PASSWORD),
   };
 }
 
@@ -41,9 +39,4 @@ export function isMailConfigured() {
       config.smtpUser &&
       config.smtpPass,
   );
-}
-
-export function isBasicAuthConfigured() {
-  const config = getAppConfig();
-  return Boolean(config.basicAuthUser && config.basicAuthPassword);
 }

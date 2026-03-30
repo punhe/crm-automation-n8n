@@ -1,9 +1,11 @@
 "use client";
 
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   AlarmClockCheck,
+  ArrowRight,
   LayoutDashboard,
   Mail,
   ReceiptText,
@@ -27,6 +29,16 @@ type AppShellProps = {
 
 export function AppShell({ children, mode, mailReady }: AppShellProps) {
   const pathname = usePathname();
+  const isAuthRoute =
+    pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+
+  if (isAuthRoute) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
@@ -92,6 +104,35 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
 
         <main className="flex-1">
           <div className="mx-auto flex min-h-full max-w-[1120px] flex-col gap-6 pb-8">
+            <section className="panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="eyebrow">Protected by Clerk</p>
+                <p className="mt-2 text-sm leading-7 text-[color:var(--muted)]">
+                  Session-backed access is now protecting all internal routes, while
+                  your RepairShopr and mail actions remain server-side only.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 self-start rounded-full border border-[color:var(--border)] bg-white/80 px-4 py-2 sm:self-center">
+                <div className="text-right">
+                  <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">
+                    Account
+                  </p>
+                  <p className="mt-1 flex items-center gap-2 text-sm font-semibold">
+                    Manage session
+                    <ArrowRight className="h-4 w-4 text-[var(--accent)]" />
+                  </p>
+                </div>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: "h-10 w-10",
+                    },
+                  }}
+                />
+              </div>
+            </section>
+
             {children}
           </div>
         </main>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
@@ -36,9 +37,11 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AppShell mode={mode} mailReady={mailReady}>
-          {children}
-        </AppShell>
+        <ClerkProvider>
+          <AppShell mode={mode} mailReady={mailReady}>
+            {children}
+          </AppShell>
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -1,41 +1,16 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-function unauthorized() {
-  return new NextResponse("Authentication required.", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="RepairShopr Revenue Console"',
-    },
-  });
-}
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 
-export function proxy(request: NextRequest) {
-  const expectedUser = process.env.APP_BASIC_AUTH_USER;
-  const expectedPassword = process.env.APP_BASIC_AUTH_PASSWORD;
-
-  if (!expectedUser || !expectedPassword) {
-    return NextResponse.next();
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) {
+    await auth.protect();
   }
-
-  const header = request.headers.get("authorization");
-  if (!header?.startsWith("Basic ")) {
-    return unauthorized();
-  }
-
-  const encoded = header.replace("Basic ", "");
-  const decoded = atob(encoded);
-  const separatorIndex = decoded.indexOf(":");
-  const username = separatorIndex >= 0 ? decoded.slice(0, separatorIndex) : "";
-  const password = separatorIndex >= 0 ? decoded.slice(separatorIndex + 1) : "";
-
-  if (username !== expectedUser || password !== expectedPassword) {
-    return unauthorized();
-  }
-
-  return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+  ],
 };

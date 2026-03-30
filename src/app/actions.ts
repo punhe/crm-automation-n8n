@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireUser } from "@/lib/auth";
 import { isMailConfigured } from "@/lib/env";
 import { toCurrency, toDateLabel } from "@/lib/format";
 import { sendMail } from "@/lib/mail";
@@ -52,6 +53,8 @@ function reminderCopy(stage: ReminderStage) {
 }
 
 export async function resendInvoiceEmailAction(formData: FormData) {
+  await requireUser();
+
   const invoiceId = Number(formData.get("invoiceId"));
   const returnTo = String(formData.get("returnTo") || "/invoices");
 
@@ -67,6 +70,8 @@ export async function resendInvoiceEmailAction(formData: FormData) {
 }
 
 export async function sendReminderEmailAction(formData: FormData) {
+  await requireUser();
+
   const invoiceId = Number(formData.get("invoiceId"));
   const stage = String(formData.get("stage")) as ReminderStage;
   const returnTo = String(formData.get("returnTo") || "/recovery");
