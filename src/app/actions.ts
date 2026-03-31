@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth";
-import { isMailConfigured } from "@/lib/env";
+import { isMailConfigured, isN8nConfigured } from "@/lib/env";
 import { toCurrency, toDateLabel } from "@/lib/format";
 import { sendMail } from "@/lib/mail";
+import { activateWorkflow, deactivateWorkflow } from "@/lib/n8n";
 import {
   getReminderSubject,
   resolveRecipientEmail,
@@ -20,6 +21,7 @@ const allowedStages = new Set<ReminderStage>([
   "overdue-7",
   "overdue-14",
 ]);
+const allowedWorkflowStates = new Set(["activate", "deactivate"]);
 
 function withFlash(returnTo: string, flash: string) {
   const url = new URL(returnTo || "/", "http://localhost");
@@ -168,5 +170,35 @@ export async function sendReminderEmailAction(formData: FormData) {
     redirect(withFlash(returnTo, "reminder-sent"));
   } catch {
     redirect(withFlash(returnTo, "reminder-failed"));
+  }
+}
+
+export async function setWorkflowActiveAction(formData: FormData) {
+  await requireUser();
+
+  const workflowId = String(formData.get("workflowId") || "").trim();
+  const nextState = String(formData.get("nextState") || "").trim();
+  const returnTo = String(formData.get("returnTo") || "/workflows");
+
+  if (!workflowId || !allowedWorkflowStates.has(nextState)) {
+    redirect(withFlash(returnTo, "workflow-action-failed"));
+  }
+
+  if (!isN8nConfigured()) {
+    redirect(withFlash(returnTo, "n8n-config-missing"));
+  }
+
+  try {
+    if (nextState === "activate") {
+      await activateWorkflow(workflowId);
+      revalidatePath("/workflows");
+      redirect(withFlash(returnTo, "workflow-activated"));
+    }
+
+    await deactivateWorkflow(workflowId);
+    revalidatePath("/workflows");
+    redirect(withFlash(returnTo, "workflow-deactivated"));
+  } catch {
+    redirect(withFlash(returnTo, "workflow-action-failed"));
   }
 }

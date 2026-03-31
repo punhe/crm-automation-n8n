@@ -7,6 +7,8 @@ function readString(value: string | undefined) {
 export function getAppConfig() {
   const repairshoprSubdomain = readString(process.env.REPAIRSHOPR_SUBDOMAIN);
   const repairshoprApiKey = readString(process.env.REPAIRSHOPR_API_KEY);
+  const n8nBaseUrl = readString(process.env.N8N_BASE_URL);
+  const n8nApiKey = readString(process.env.N8N_API_KEY);
   const smtpHost = readString(process.env.SMTP_HOST);
   const smtpUser = readString(process.env.SMTP_USER);
   const smtpPass = readString(process.env.SMTP_PASS);
@@ -14,6 +16,9 @@ export function getAppConfig() {
   return {
     repairshoprSubdomain,
     repairshoprApiKey,
+    n8nBaseUrl,
+    n8nApiKey,
+    n8nWebhookBaseUrl: readString(process.env.N8N_WEBHOOK_BASE_URL),
     appCurrency: readString(process.env.APP_CURRENCY) || "USD",
     maxPages: Number(process.env.REPAIRSHOPR_MAX_PAGES || "5"),
     smtpHost,
@@ -39,4 +44,9 @@ export function isMailConfigured() {
       config.smtpUser &&
       config.smtpPass,
   );
+}
+
+export function isN8nConfigured() {
+  const config = getAppConfig();
+  return Boolean(config.n8nBaseUrl && config.n8nApiKey);
 }

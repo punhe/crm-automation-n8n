@@ -5,11 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   AlarmClockCheck,
-  ArrowRight,
+  Bell,
+  Grid3X3,
   LayoutDashboard,
   Mail,
+  Menu,
+  MessageSquare,
+  Plus,
   ReceiptText,
+  Search,
+  Settings,
   Users,
+  Workflow,
 } from "lucide-react";
 
 import { cn } from "@/lib/format";
@@ -19,6 +26,7 @@ const navigation = [
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/invoices", label: "Invoices", icon: ReceiptText },
   { href: "/recovery", label: "Recovery", icon: AlarmClockCheck },
+  { href: "/workflows", label: "Flows", icon: Workflow },
 ];
 
 type AppShellProps = {
@@ -31,6 +39,12 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
   const pathname = usePathname();
   const isAuthRoute =
     pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  const currentSection =
+    navigation.find((item) =>
+      item.href === "/"
+        ? pathname === "/"
+        : pathname === item.href || pathname.startsWith(`${item.href}/`),
+    )?.label || "Workspace";
 
   if (isAuthRoute) {
     return (
@@ -41,98 +55,153 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
-      <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col gap-6 p-4 lg:flex-row lg:p-6">
-        <aside className="panel relative overflow-hidden p-5 lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-[320px] lg:p-7">
-          <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,_rgba(13,106,110,0.25),_transparent_60%)]" />
-          <div className="relative">
-            <p className="eyebrow">RepairShopr CRM</p>
-            <h1 className="mt-3 max-w-[13ch] text-3xl font-semibold leading-tight tracking-tight">
-              Revenue and relationship control room.
+    <div className="flex min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
+      {/* ── Icon sidebar (Figma Navigation Web / Icons) ── */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[64px] flex-col items-center bg-white py-5 lg:flex">
+        {/* Logo */}
+        <div className="mb-6 flex h-9 w-9 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--accent),#7b8aff)] text-sm font-bold text-white">
+          C
+        </div>
+
+        {/* Top navigation icons */}
+        <nav className="flex flex-1 flex-col items-center gap-1">
+          {navigation.map(({ href, label, icon: Icon }) => {
+            const active =
+              href === "/"
+                ? pathname === href
+                : pathname === href || pathname.startsWith(`${href}/`);
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                title={label}
+                className={cn("nav-icon-btn", active && "active")}
+              >
+                <Icon className="h-[20px] w-[20px]" />
+              </Link>
+            );
+          })}
+
+          <div className="my-3 h-px w-6 bg-[var(--border)]" />
+
+          {/* Extra icon slots */}
+          <div className="nav-icon-btn relative">
+            <Bell className="h-[20px] w-[20px]" />
+            <span className="badge-dot badge-dot-pink" />
+          </div>
+          <div className="nav-icon-btn relative">
+            <MessageSquare className="h-[20px] w-[20px]" />
+            <span className="badge-dot badge-dot-blue" />
+          </div>
+          <div className="nav-icon-btn">
+            <Mail className="h-[20px] w-[20px]" />
+          </div>
+          <div className="nav-icon-btn">
+            <Search className="h-[20px] w-[20px]" />
+          </div>
+        </nav>
+
+        {/* Bottom icons */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="nav-icon-btn">
+            <Settings className="h-[20px] w-[20px]" />
+          </div>
+
+          {/* User avatar */}
+          <div className="mt-3 relative">
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "h-8 w-8 rounded-[5px]",
+                },
+              }}
+            />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[var(--accent-mint)]" />
+          </div>
+        </div>
+
+        {/* Right edge separator */}
+        <div className="absolute right-0 top-0 h-full w-px bg-[var(--border)]" />
+      </aside>
+
+      {/* ── Main content area ── */}
+      <div className="flex flex-1 flex-col lg:ml-[64px]">
+        {/* ── Top bar (Figma Navigation Web / Top Bar) ── */}
+        <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-white px-4 lg:px-6">
+          <div className="flex items-center gap-3">
+            {/* Mobile menu trigger */}
+            <button className="topbar-btn lg:hidden">
+              <Menu className="h-4 w-4" />
+            </button>
+
+            <div className="topbar-btn hidden lg:flex">
+              <Menu className="h-4 w-4" />
+            </div>
+            <div className="topbar-btn hidden lg:flex">
+              <Plus className="h-4 w-4" />
+            </div>
+            <div className="topbar-btn hidden lg:flex">
+              <Grid3X3 className="h-4 w-4" />
+            </div>
+
+            <h1 className="ml-2 text-lg font-semibold tracking-tight text-[var(--foreground)]">
+              {currentSection === "Overview" ? "Dashboard" : currentSection}
             </h1>
-            <p className="mt-4 max-w-[28ch] text-sm leading-7 text-[color:var(--muted)]">
-              Track customers, watch invoice risk, and handle billing follow-ups without leaving one calm workspace.
-            </p>
+          </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              <span className="inline-flex rounded-full bg-[rgba(13,106,110,0.14)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-                {mode === "live" ? "Live connection" : "Demo mode"}
-              </span>
-              <span className="inline-flex rounded-full bg-[rgba(202,114,66,0.14)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent-2)]">
-                {mailReady ? "Mail ready" : "Mail setup needed"}
-              </span>
+          <div className="flex items-center gap-3">
+            {/* Status badges */}
+            <span className="hidden items-center gap-1.5 rounded-md bg-[var(--accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] sm:inline-flex">
+              {mode === "live" ? "Live" : "Demo"}
+            </span>
+            <span className="hidden items-center gap-1.5 rounded-md bg-[rgba(124,231,172,0.14)] px-2.5 py-1 text-xs font-medium text-[#2DB77B] sm:inline-flex">
+              {mailReady ? "Mail ✓" : "Mail ✗"}
+            </span>
+
+            {/* User button (desktop) */}
+            <div className="hidden lg:block">
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "h-8 w-8",
+                  },
+                }}
+              />
             </div>
           </div>
 
-          <nav className="relative mt-8 grid gap-2">
-            {navigation.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href;
+          {/* Bottom border */}
+          <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--border)]" />
+        </header>
 
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "flex items-center justify-between rounded-2xl border px-4 py-3 transition",
-                    active
-                      ? "border-[rgba(13,106,110,0.22)] bg-[rgba(13,106,110,0.1)] text-[var(--foreground)]"
-                      : "border-transparent bg-white/55 text-[color:var(--muted)] hover:border-[color:var(--border)] hover:bg-white/80 hover:text-[color:var(--foreground)]",
-                  )}
-                >
-                  <span className="flex items-center gap-3 text-sm font-semibold">
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </span>
-                  <span className="text-xs uppercase tracking-[0.2em]">
-                    {active ? "Here" : "Open"}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
+        {/* ── Mobile bottom nav ── */}
+        <nav className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-center justify-around border-t border-[var(--border)] bg-white lg:hidden">
+          {navigation.map(({ href, label, icon: Icon }) => {
+            const active =
+              href === "/"
+                ? pathname === href
+                : pathname === href || pathname.startsWith(`${href}/`);
 
-          <div className="relative mt-8 rounded-[28px] border border-[rgba(31,42,38,0.08)] bg-[var(--panel-strong)] p-4">
-            <div className="flex items-center gap-3 text-[var(--accent)]">
-              <Mail className="h-5 w-5" />
-              <p className="text-sm font-semibold">Email-first workflow</p>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-              This build intentionally avoids Slack. All follow-up actions stay inside RepairShopr and your mail stack.
-            </p>
-          </div>
-        </aside>
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 text-xs",
+                  active ? "text-[var(--accent)]" : "text-[var(--muted)]",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-        <main className="flex-1">
-          <div className="mx-auto flex min-h-full max-w-[1120px] flex-col gap-6 pb-8">
-            <section className="panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="eyebrow">Protected by Clerk</p>
-                <p className="mt-2 text-sm leading-7 text-[color:var(--muted)]">
-                  Session-backed access is now protecting all internal routes, while
-                  your RepairShopr and mail actions remain server-side only.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4 self-start rounded-full border border-[color:var(--border)] bg-white/80 px-4 py-2 sm:self-center">
-                <div className="text-right">
-                  <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">
-                    Account
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-sm font-semibold">
-                    Manage session
-                    <ArrowRight className="h-4 w-4 text-[var(--accent)]" />
-                  </p>
-                </div>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "h-10 w-10",
-                    },
-                  }}
-                />
-              </div>
-            </section>
-
+        {/* ── Page content ── */}
+        <main className="flex-1 overflow-y-auto px-4 py-5 pb-20 lg:px-6 lg:pb-6">
+          <div className="mx-auto flex max-w-[1180px] flex-col gap-5">
             {children}
           </div>
         </main>

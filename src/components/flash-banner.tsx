@@ -44,6 +44,26 @@ const flashMap: Record<
     body: "The request did not include a valid reminder stage.",
     tone: "slate",
   },
+  "workflow-activated": {
+    title: "Workflow published",
+    body: "The selected n8n workflow is now active from this console.",
+    tone: "teal",
+  },
+  "workflow-deactivated": {
+    title: "Workflow paused",
+    body: "The selected n8n workflow has been deactivated.",
+    tone: "amber",
+  },
+  "workflow-action-failed": {
+    title: "Workflow update failed",
+    body: "The n8n API did not accept that workflow change. Re-check the instance URL and API key.",
+    tone: "rose",
+  },
+  "n8n-config-missing": {
+    title: "n8n is not configured",
+    body: "Set N8N_BASE_URL and N8N_API_KEY before managing workflows from this app.",
+    tone: "amber",
+  },
 };
 
 export function FlashBanner({ flash }: { flash?: string | string[] }) {
@@ -55,14 +75,17 @@ export function FlashBanner({ flash }: { flash?: string | string[] }) {
   const message = flashMap[key];
 
   return (
-    <section className="panel flex flex-col gap-3 border-[rgba(13,106,110,0.12)] bg-white/85 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <p className="text-lg font-semibold text-[color:var(--foreground)]">
-          {message.title}
-        </p>
-        <p className="mt-1 text-sm leading-6 text-[color:var(--muted)]">
-          {message.body}
-        </p>
+    <section className="surface-card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="flex items-start gap-2.5">
+        <span className="mt-1.5 h-2 w-2 rounded-full bg-[var(--accent)]" />
+        <div>
+          <p className="text-base font-semibold text-[var(--foreground)]">
+            {message.title}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+            {message.body}
+          </p>
+        </div>
       </div>
       <StatusPill label="status" tone={message.tone} />
     </section>

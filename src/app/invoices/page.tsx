@@ -30,11 +30,11 @@ export default async function InvoicesPage({
 
   return (
     <>
-      <section className="panel p-6 sm:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      <section className="panel p-5 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="eyebrow">Invoices</p>
-            <h2 className="section-title mt-4 max-w-[14ch]">
+            <h2 className="section-title mt-3 max-w-[14ch]">
               Keep billing visible without leaving your CRM seat.
             </h2>
           </div>
@@ -46,10 +46,10 @@ export default async function InvoicesPage({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-semibold transition ${
+                className={`inline-flex min-h-9 items-center justify-center rounded-lg px-4 text-sm font-semibold transition ${
                   item.active
                     ? "bg-[var(--accent)] text-white"
-                    : "border border-[color:var(--border)] bg-white/75 text-[color:var(--foreground)] hover:bg-white"
+                    : "border border-[var(--border)] bg-white text-[var(--foreground)] hover:bg-[var(--panel-soft)]"
                 }`}
               >
                 {item.label}
@@ -61,8 +61,8 @@ export default async function InvoicesPage({
 
       <FlashBanner flash={params.flash} />
 
-      <section className="panel p-6">
-        <div className="overflow-hidden">
+      <section className="panel p-5">
+        <div className="overflow-hidden rounded-lg">
           <table className="data-table">
             <thead>
               <tr>
@@ -81,19 +81,19 @@ export default async function InvoicesPage({
                 return (
                   <tr key={invoice.id}>
                     <td>
-                      <p className="font-semibold">{invoice.number}</p>
-                      <p className="mt-1 text-sm text-[color:var(--muted)]">
+                      <p className="font-semibold text-[var(--foreground)]">{invoice.number}</p>
+                      <p className="mt-0.5 text-xs text-[var(--muted)]">
                         Updated {toRelativeTime(invoice.updated_at)}
                       </p>
                     </td>
                     <td>
-                      <p className="font-semibold">{invoice.customer_business_then_name}</p>
+                      <p className="font-medium text-[var(--foreground)]">{invoice.customer_business_then_name}</p>
                     </td>
                     <td>
-                      <p className="font-semibold">{toDateLabel(invoice.due_date)}</p>
+                      <p className="font-medium text-[var(--foreground)]">{toDateLabel(invoice.due_date)}</p>
                     </td>
                     <td>
-                      <p className="font-semibold">{toCurrency(invoice.total)}</p>
+                      <p className="font-semibold text-[var(--foreground)]">{toCurrency(invoice.total)}</p>
                     </td>
                     <td>
                       <StatusPill
@@ -120,9 +120,9 @@ export default async function InvoicesPage({
         </div>
 
         {result.items.length === 0 ? (
-          <div className="surface-card mt-6 p-6">
-            <p className="text-lg font-semibold">No invoices in this view.</p>
-            <p className="mt-2 text-sm leading-7 text-[color:var(--muted)]">
+          <div className="surface-card mt-5 p-5">
+            <p className="text-base font-semibold text-[var(--foreground)]">No invoices in this view.</p>
+            <p className="mt-1.5 text-sm leading-7 text-[var(--muted)]">
               Switch scope or check your RepairShopr filters if you expected invoices here.
             </p>
           </div>

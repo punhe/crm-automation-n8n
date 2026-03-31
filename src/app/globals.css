@@ -1,21 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4efe4;
-  --foreground: #1f2a26;
-  --muted: #6d6a5c;
-  --border: rgba(31, 42, 38, 0.1);
-  --panel: rgba(255, 250, 241, 0.84);
-  --panel-strong: rgba(255, 255, 255, 0.92);
-  --accent: #0d6a6e;
-  --accent-strong: #085559;
-  --accent-2: #c46a44;
+  /* CRM UI Kit Color System — pulled from Figma */
+  --background: #F0F0F3;
+  --background-strong: #E8E8ED;
+  --foreground: #1C1D21;
+  --foreground-soft: #3A3B42;
+  --muted: #8181A5;
+  --border: #ECECF2;
+  --panel: #FFFFFF;
+  --panel-strong: #FFFFFF;
+  --panel-soft: #F5F5FA;
+  --accent: #5E81F4;
+  --accent-strong: #4A6DE0;
+  --accent-soft: rgba(94, 129, 244, 0.10);
+  --accent-mint: #7CE7AC;
+  --accent-amber: #F4BE5E;
+  --accent-rose: #FF808B;
+  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
+
+  /* Progress bar palette */
+  --progress-high: #FF808B;
+  --progress-primary: #5E81F4;
+  --progress-low: #7CE7AC;
+
+  /* Tag palette */
+  --tag-green-bg: rgba(124, 231, 172, 0.16);
+  --tag-green-text: #2DB77B;
+  --tag-yellow-bg: rgba(244, 190, 94, 0.16);
+  --tag-yellow-text: #C49332;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-space-grotesk);
+  --font-sans: var(--font-inter), var(--font-plus-jakarta-sans);
   --font-mono: var(--font-ibm-plex-mono);
 }
 
@@ -28,12 +48,9 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(13, 106, 110, 0.16), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(196, 106, 68, 0.18), transparent 24%),
-    linear-gradient(180deg, #f8f3ea 0%, #f4efe4 52%, #efe8da 100%);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), var(--font-plus-jakarta-sans), 'Inter', system-ui, sans-serif;
 }
 
 a {
@@ -42,82 +59,196 @@ a {
 }
 
 ::selection {
-  background: rgba(13, 106, 110, 0.18);
+  background: rgba(94, 129, 244, 0.20);
 }
 
+/* ---- Panel (card container) ---- */
 .panel {
-  border: 1px solid var(--border);
   background: var(--panel);
-  backdrop-filter: blur(16px);
-  border-radius: 30px;
-  box-shadow:
-    0 24px 56px rgba(74, 61, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.66);
+  border-radius: 12px;
+  box-shadow: var(--shadow-panel);
+  border: none;
 }
 
+/* ---- Eyebrow label ---- */
 .eyebrow {
   font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.72rem;
   line-height: 1rem;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
+/* ---- Section title ---- */
 .section-title {
-  font-size: clamp(1.75rem, 2vw, 2.4rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
-  font-weight: 600;
+  font-size: clamp(1.5rem, 2vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--foreground);
 }
 
+/* ---- Divider ---- */
 .soft-divider {
-  border-top: 1px solid rgba(31, 42, 38, 0.08);
+  border-top: 1px solid var(--border);
 }
 
+/* ---- Data table ---- */
 .data-table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .data-table th {
-  padding: 0 0 0.85rem;
+  padding: 0 0.75rem 0.75rem;
   text-align: left;
-  font-family: var(--font-ibm-plex-mono), monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .data-table td {
-  padding: 1rem 0;
-  border-top: 1px solid rgba(31, 42, 38, 0.08);
-  vertical-align: top;
+  padding: 0.875rem 0.75rem;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
 }
 
+.data-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--panel-soft);
+}
+
+/* ---- Form input ---- */
 .form-input {
   width: 100%;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.88);
-  padding: 0.9rem 1.1rem;
-  font-size: 0.95rem;
+  background: var(--panel);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
   outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  color: var(--foreground);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .form-input:focus {
-  border-color: rgba(13, 106, 110, 0.45);
-  box-shadow: 0 0 0 4px rgba(13, 106, 110, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+/* ---- Surface card ---- */
 .surface-card {
-  border-radius: 24px;
-  border: 1px solid rgba(31, 42, 38, 0.08);
-  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+  border: none;
 }
 
+/* ---- Grid pattern for charts ---- */
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(94, 129, 244, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 129, 244, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ---- Trend fill ---- */
+.trend-fill {
+  background:
+    linear-gradient(180deg, rgba(94, 129, 244, 0.18) 0%, rgba(94, 129, 244, 0.02) 100%);
+}
+
+/* ---- Clerk overrides ---- */
+.cl-rootBox {
+  width: 100%;
+}
+
+.cl-cardBox,
+.cl-card {
+  width: 100%;
+}
+
+/* ---- Nav icon button ---- */
+.nav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  color: var(--muted);
+  transition: all 150ms ease;
+  position: relative;
+}
+
+.nav-icon-btn:hover {
+  background: var(--panel-soft);
+  color: var(--foreground);
+}
+
+.nav-icon-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.nav-icon-btn.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+/* ---- Top bar icon button ---- */
+.topbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  transition: all 150ms ease;
+}
+
+.topbar-btn:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+
+/* ---- Badge dot ---- */
+.badge-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--panel);
+}
+
+.badge-dot-pink {
+  background: var(--accent-rose);
+}
+
+.badge-dot-blue {
+  background: var(--accent);
+}
+
+/* ---- Responsive table ---- */
 @media (max-width: 720px) {
   .data-table thead {
     display: none;
@@ -132,13 +263,13 @@ a {
   }
 
   .data-table td {
-    padding: 0.45rem 0;
+    padding: 0.4rem 0;
     border-top: 0;
   }
 
   .data-table tr {
-    border-top: 1px solid rgba(31, 42, 38, 0.08);
-    padding: 1rem 0;
+    border-top: 1px solid var(--border);
+    padding: 0.875rem 0;
   }
 
   .data-table tr:first-child {

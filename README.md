@@ -9,6 +9,7 @@ An internal Next.js 16 app for operating a simple CRM and invoice recovery workf
 - Shows a recovery queue grouped by reminder stage
 - Resends native invoice emails through RepairShopr
 - Sends custom reminder emails through SMTP
+- Lists n8n workflows with publish or pause controls
 - Falls back to demo data when RepairShopr credentials are not configured
 - Uses Clerk to protect all internal routes
 
@@ -18,6 +19,7 @@ An internal Next.js 16 app for operating a simple CRM and invoice recovery workf
 - `/customers` searchable customer directory
 - `/invoices` invoice list with resend action
 - `/recovery` email-first billing follow-up console
+- `/workflows` n8n workflow management console
 
 ## Environment variables
 
@@ -61,7 +63,7 @@ If Clerk keys are configured, unauthenticated users are redirected to `/sign-in`
 - Clerk now handles app authentication. The old HTTP Basic Auth layer has been removed.
 - The dashboard intentionally avoids Slack and stays focused on Email + RepairShopr only.
 - Public RepairShopr docs paginate invoices by page, so the dashboard uses a configurable `REPAIRSHOPR_MAX_PAGES` cap to stay API-safe.
-- `N8N_BASE_URL` and `N8N_API_KEY` are reserved for the next step: running n8n workflows and reading execution analytics from the app.
+- `N8N_BASE_URL` and `N8N_API_KEY` power the in-app workflows screen, including publish or pause controls and recent execution visibility.
 
 ## Useful commands
 

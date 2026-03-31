@@ -1,26 +1,33 @@
 import { SignUp } from "@clerk/nextjs";
 
+import { AuthShell } from "@/components/auth-shell";
+
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="panel w-full max-w-[980px] overflow-hidden p-3 sm:p-5">
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_420px]">
-          <section className="rounded-[26px] bg-[linear-gradient(145deg,rgba(13,106,110,0.16),rgba(255,255,255,0.6),rgba(196,106,68,0.2))] p-7 sm:p-9">
-            <p className="eyebrow">Clerk Auth</p>
-            <h1 className="section-title mt-4 max-w-[12ch]">
-              Create access for your internal CRM team.
-            </h1>
-            <p className="mt-4 max-w-xl text-base leading-8 text-[color:var(--muted)]">
-              Use Clerk to gate this app properly before exposing RepairShopr
-              billing actions or future n8n workflow controls to your operators.
-            </p>
-          </section>
-
-          <section className="surface-card flex items-center justify-center p-4 sm:p-6">
-            <SignUp />
-          </section>
-        </div>
-      </div>
-    </div>
+    <AuthShell
+      eyebrow="Team Provisioning"
+      title="Create access for the internal ops team."
+      description="New accounts should land in the same protected CRM shell, with customer records, invoice actions and automation entry points hidden until Clerk finishes authentication."
+      authSlot={
+        <SignUp
+          appearance={{
+            elements: {
+              rootBox: "w-full",
+              cardBox: "w-full",
+              card: "w-full border-0 bg-transparent p-0 shadow-none",
+              headerTitle: "text-[24px] font-bold tracking-tight text-[#1C1D21]",
+              headerSubtitle: "text-sm leading-6 text-[#8181A5]",
+              socialButtonsBlockButton:
+                "h-10 rounded-lg border border-[#ECECF2] bg-white text-[#1C1D21] shadow-none hover:bg-[#F5F5FA]",
+              formFieldInput:
+                "h-10 rounded-lg border border-[#ECECF2] bg-white text-[#1C1D21] shadow-none focus:border-[#5E81F4] focus:ring-2 focus:ring-[rgba(94,129,244,0.12)]",
+              formButtonPrimary:
+                "h-10 rounded-lg bg-[#5E81F4] text-white hover:bg-[#4A6DE0]",
+              footerActionLink: "text-[#5E81F4] hover:text-[#4A6DE0]",
+            },
+          }}
+        />
+      }
+    />
   );
 }

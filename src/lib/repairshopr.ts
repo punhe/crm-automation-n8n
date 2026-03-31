@@ -1,5 +1,6 @@
 import "server-only";
 
+import { requireUser } from "@/lib/auth";
 import { getDemoCustomers, getDemoInvoices } from "@/lib/demo-data";
 import { getAppConfig, isRepairShoprConfigured } from "@/lib/env";
 import { toNumber } from "@/lib/format";
@@ -97,6 +98,8 @@ export async function getCustomers({
   query?: string;
   page?: number;
 }): Promise<PaginatedResult<Customer>> {
+  await requireUser();
+
   if (!isRepairShoprConfigured()) {
     const customers = getDemoCustomers().filter((customer) => {
       if (!query) {
@@ -136,6 +139,8 @@ export async function getCustomers({
 }
 
 export async function getLatestCustomer() {
+  await requireUser();
+
   if (!isRepairShoprConfigured()) {
     return getDemoCustomers()[0] ?? null;
   }
@@ -182,10 +187,13 @@ export async function getInvoiceList({
   state?: InvoiceState;
   page?: number;
 }) {
+  await requireUser();
   return getInvoicesPage({ state, page });
 }
 
 export async function getInvoiceById(invoiceId: number) {
+  await requireUser();
+
   if (!isRepairShoprConfigured()) {
     return getDemoInvoices().find((invoice) => invoice.id === invoiceId) ?? null;
   }
@@ -195,6 +203,8 @@ export async function getInvoiceById(invoiceId: number) {
 }
 
 export async function resendInvoiceEmail(invoiceId: number) {
+  await requireUser();
+
   if (!isRepairShoprConfigured()) {
     return { success: true, mode: "demo" as const };
   }
@@ -207,6 +217,8 @@ export async function resendInvoiceEmail(invoiceId: number) {
 }
 
 export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
+  await requireUser();
+
   const config = getAppConfig();
   const unpaidInvoices: Invoice[] = [];
   let coverage: DashboardSnapshot["invoiceCoverage"] = "full";
@@ -246,6 +258,8 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
 }
 
 export async function getRecoveryQueue(): Promise<RecoveryInvoice[]> {
+  await requireUser();
+
   const snapshot = await getDashboardSnapshot();
   return snapshot.recoveryQueue
     .filter((invoice) =>

@@ -21,12 +21,12 @@ export default async function CustomersPage({
 
   return (
     <>
-      <section className="panel p-6 sm:p-8">
+      <section className="panel p-5 sm:p-6">
         <p className="eyebrow">Customers</p>
-        <h2 className="section-title mt-4 max-w-[14ch]">
+        <h2 className="section-title mt-3 max-w-[14ch]">
           Search the people and accounts behind your cashflow.
         </h2>
-        <p className="mt-4 max-w-2xl text-base leading-8 text-[color:var(--muted)]">
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
           This directory is intentionally simple: search by name, business or
           email, then jump from contact context into invoice and billing follow-up.
         </p>
@@ -34,7 +34,7 @@ export default async function CustomersPage({
 
       <FlashBanner flash={params.flash} />
 
-      <section className="panel p-6">
+      <section className="panel p-5">
         <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
           <input
             className="form-input"
@@ -45,21 +45,21 @@ export default async function CustomersPage({
           />
           <button
             type="submit"
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            className="inline-flex min-h-9 items-center justify-center rounded-lg bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
           >
             Search customers
           </button>
         </form>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
           {customers.items.map((customer) => (
-            <article key={customer.id} className="surface-card p-5">
+            <article key={customer.id} className="surface-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xl font-semibold">
+                  <p className="text-base font-semibold text-[var(--foreground)]">
                     {customer.business_name || customer.fullname}
                   </p>
-                  <p className="mt-1 text-sm text-[color:var(--muted)]">
+                  <p className="mt-0.5 text-sm text-[var(--muted)]">
                     {customer.fullname}
                   </p>
                 </div>
@@ -75,22 +75,22 @@ export default async function CustomersPage({
                 />
               </div>
 
-              <dl className="mt-5 grid gap-3 text-sm text-[color:var(--muted)]">
+              <dl className="mt-4 grid gap-2.5 text-sm text-[var(--muted)]">
                 <div>
                   <dt className="eyebrow">Email</dt>
-                  <dd className="mt-1 text-[color:var(--foreground)]">
+                  <dd className="mt-0.5 text-[var(--foreground)]">
                     {customer.email || "Missing"}
                   </dd>
                 </div>
                 <div>
                   <dt className="eyebrow">Phone</dt>
-                  <dd className="mt-1 text-[color:var(--foreground)]">
+                  <dd className="mt-0.5 text-[var(--foreground)]">
                     {customer.mobile || customer.phone || "Missing"}
                   </dd>
                 </div>
                 <div>
                   <dt className="eyebrow">Last Updated</dt>
-                  <dd className="mt-1 text-[color:var(--foreground)]">
+                  <dd className="mt-0.5 text-[var(--foreground)]">
                     {toRelativeTime(customer.updated_at)}
                   </dd>
                 </div>
@@ -100,9 +100,9 @@ export default async function CustomersPage({
         </div>
 
         {customers.items.length === 0 ? (
-          <div className="surface-card mt-6 p-6">
-            <p className="text-lg font-semibold">No customers matched that query.</p>
-            <p className="mt-2 text-sm leading-7 text-[color:var(--muted)]">
+          <div className="surface-card mt-5 p-5">
+            <p className="text-base font-semibold text-[var(--foreground)]">No customers matched that query.</p>
+            <p className="mt-1.5 text-sm leading-7 text-[var(--muted)]">
               Try a looser search term or remove filters to inspect the full directory.
             </p>
           </div>

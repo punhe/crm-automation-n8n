@@ -29,11 +29,11 @@ function RecoverySection({
   }
 
   return (
-    <section className="panel p-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <section className="panel p-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow">{title}</p>
-          <h3 className="mt-3 text-2xl font-semibold tracking-tight">
+          <h3 className="mt-2 text-xl font-bold tracking-tight text-[var(--foreground)]">
             {description}
           </h3>
         </div>
@@ -43,44 +43,44 @@ function RecoverySection({
         />
       </div>
 
-      <div className="mt-6 grid gap-4">
+      <div className="mt-5 grid gap-3">
         {invoices.map((invoice) => (
-          <article key={invoice.id} className="surface-card p-5">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-              <div className="grid gap-4 md:grid-cols-4 md:gap-6">
+          <article key={invoice.id} className="surface-card p-4">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="grid gap-3 md:grid-cols-4 md:gap-5">
                 <div>
                   <p className="eyebrow">Invoice</p>
-                  <p className="mt-2 text-lg font-semibold">{invoice.number}</p>
+                  <p className="mt-1.5 text-base font-semibold text-[var(--foreground)]">{invoice.number}</p>
                 </div>
                 <div>
                   <p className="eyebrow">Customer</p>
-                  <p className="mt-2 text-lg font-semibold">
+                  <p className="mt-1.5 text-base font-semibold text-[var(--foreground)]">
                     {invoice.customer_business_then_name}
                   </p>
                 </div>
                 <div>
                   <p className="eyebrow">Due date</p>
-                  <p className="mt-2 text-lg font-semibold">
+                  <p className="mt-1.5 text-base font-semibold text-[var(--foreground)]">
                     {toDateLabel(invoice.due_date)}
                   </p>
                 </div>
                 <div>
                   <p className="eyebrow">Amount</p>
-                  <p className="mt-2 text-lg font-semibold">
+                  <p className="mt-1.5 text-base font-semibold text-[var(--foreground)]">
                     {toCurrency(invoice.total)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-start gap-3 xl:items-end">
+              <div className="flex flex-col items-start gap-2.5 xl:items-end">
                 <StatusPill
                   label={getStageLabel(invoice.status)}
                   tone={getStageTone(invoice.status)}
                 />
-                <p className="text-sm text-[color:var(--muted)]">
+                <p className="text-xs text-[var(--muted)]">
                   Recipient: {invoice.recipientEmail || "Resolve from invoice detail"}
                 </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
                   {reminderStage ? (
                     <form action={sendReminderEmailAction}>
                       <input type="hidden" name="invoiceId" value={invoice.id} />
@@ -120,12 +120,12 @@ export default async function RecoveryPage({ searchParams }: RecoveryPageProps) 
 
   return (
     <>
-      <section className="panel p-6 sm:p-8">
+      <section className="panel p-5 sm:p-6">
         <p className="eyebrow">Recovery</p>
-        <h2 className="section-title mt-4 max-w-[14ch]">
+        <h2 className="section-title mt-3 max-w-[14ch]">
           Run billing follow-up from one quiet, email-first queue.
         </h2>
-        <p className="mt-4 max-w-2xl text-base leading-8 text-[color:var(--muted)]">
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
           Each section below represents a reminder moment. Use the custom reminder
           button when you want softer tone control, or resend the native invoice
           email directly from RepairShopr when speed matters more than wording.

@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
 import { isMailConfigured } from "@/lib/env";
 import { getConnectionMode } from "@/lib/repairshopr";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
 });
 
@@ -19,8 +24,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RepairShopr Revenue Console",
-  description: "An email-first Next.js CRM workspace for RepairShopr operators.",
+  title: "CRM Automation Console",
+  description: "A protected CRM and billing workspace for RepairShopr operators.",
 };
 
 export default function RootLayout({
@@ -34,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${plusJakartaSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <ClerkProvider>

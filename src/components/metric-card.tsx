@@ -13,18 +13,31 @@ export function MetricCard({
   caption,
   icon,
 }: MetricCardProps) {
+  /* Deterministic-ish progress width from eyebrow length */
+  const progressWidth = 52 + ((eyebrow.length * 9) % 38);
+
   return (
-    <article className="panel p-5">
-      <div className="mb-6 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(13,106,110,0.12)] text-[var(--accent)]">
-        {icon}
+    <article className="surface-card overflow-hidden p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
+            {eyebrow}
+          </p>
+          <p className="mt-2 text-2xl font-bold tracking-tight text-[var(--foreground)]">
+            {value}
+          </p>
+        </div>
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-[var(--accent)]">
+          {icon}
+        </div>
       </div>
-      <p className="eyebrow">{eyebrow}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-[color:var(--foreground)]">
-        {value}
-      </p>
-      <p className="mt-2 max-w-xs text-sm leading-6 text-[color:var(--muted)]">
-        {caption}
-      </p>
+      <p className="mt-2 max-w-xs text-sm leading-6 text-[var(--muted)]">{caption}</p>
+      <div className="mt-4 h-1.5 rounded-full bg-[var(--panel-soft)]">
+        <div
+          className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
+          style={{ width: `${progressWidth}%` }}
+        />
+      </div>
     </article>
   );
 }

@@ -22,13 +22,13 @@ export function ActionButton({
       type="submit"
       disabled={pending}
       className={cn(
-        "inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-55",
+        "inline-flex min-h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-55",
         variant === "primary" &&
           "bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)]",
         variant === "secondary" &&
-          "border border-[color:var(--border)] bg-white/75 text-[color:var(--foreground)] hover:bg-white",
+          "border border-[var(--border)] bg-white text-[var(--foreground)] hover:bg-[var(--panel-soft)]",
         variant === "ghost" &&
-          "text-[color:var(--muted)] hover:bg-white/60 hover:text-[color:var(--foreground)]",
+          "bg-transparent text-[var(--muted)] hover:bg-[var(--panel-soft)] hover:text-[var(--foreground)]",
       )}
     >
       {pending ? pendingLabel : label}
