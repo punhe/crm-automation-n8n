@@ -149,6 +149,38 @@ export async function getLatestCustomer() {
   return payload.customer ?? null;
 }
 
+export async function getCustomerById(customerId: number): Promise<Customer | null> {
+  await requireUser();
+
+  if (!isRepairShoprConfigured()) {
+    return getDemoCustomers().find((c) => c.id === customerId) ?? null;
+  }
+
+  try {
+    const payload = await repairshoprRequest<{ customer: Customer }>(
+      `/customers/${customerId}`,
+    );
+    return payload.customer ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getCustomerInvoices(customerId: number): Promise<Invoice[]> {
+  await requireUser();
+
+  if (!isRepairShoprConfigured()) {
+    return getDemoInvoices().filter((inv) => inv.customer_id === customerId);
+  }
+
+  const payload = await repairshoprRequest<{ invoices: Invoice[] }>(
+    "/invoices",
+    undefined,
+    { customer_id: customerId },
+  );
+  return payload.invoices ?? [];
+}
+
 async function getInvoicesPage({
   state,
   page,

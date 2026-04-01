@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { setWorkflowActiveAction } from "@/app/actions";
 import { ActionButton } from "@/components/action-button";
 import { FlashBanner } from "@/components/flash-banner";
@@ -140,16 +141,36 @@ export default async function WorkflowsPage({
             </p>
           </div>
 
-          {workflowConsole.consoleUrl ? (
-            <a
-              href={workflowConsole.consoleUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/workflows/executions"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
             >
-              Open n8n
-            </a>
-          ) : null}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+              Execution History
+            </Link>
+            {workflowConsole.consoleUrl ? (
+              <a
+                href={workflowConsole.consoleUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+              >
+                Open n8n
+              </a>
+            ) : null}
+          </div>
         </div>
       </section>
 

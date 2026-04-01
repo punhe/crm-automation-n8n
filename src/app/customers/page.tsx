@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { FlashBanner } from "@/components/flash-banner";
 import { StatusPill } from "@/components/status-pill";
 import { toRelativeTime } from "@/lib/format";
@@ -27,8 +29,8 @@ export default async function CustomersPage({
           Search the people and accounts behind your cashflow.
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-          This directory is intentionally simple: search by name, business or
-          email, then jump from contact context into invoice and billing follow-up.
+          Click the eye icon on any row to open the full contact profile,
+          invoices and lifecycle details.
         </p>
       </section>
 
@@ -51,54 +53,6 @@ export default async function CustomersPage({
           </button>
         </form>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-2">
-          {customers.items.map((customer) => (
-            <article key={customer.id} className="surface-card p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-base font-semibold text-[var(--foreground)]">
-                    {customer.business_name || customer.fullname}
-                  </p>
-                  <p className="mt-0.5 text-sm text-[var(--muted)]">
-                    {customer.fullname}
-                  </p>
-                </div>
-                <StatusPill
-                  label={
-                    typeof customer.properties?.lifecycle_segment === "string"
-                      ? customer.properties.lifecycle_segment
-                      : customer.no_email
-                        ? "No email"
-                        : "Active"
-                  }
-                  tone={customer.no_email ? "slate" : "teal"}
-                />
-              </div>
-
-              <dl className="mt-4 grid gap-2.5 text-sm text-[var(--muted)]">
-                <div>
-                  <dt className="eyebrow">Email</dt>
-                  <dd className="mt-0.5 text-[var(--foreground)]">
-                    {customer.email || "Missing"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="eyebrow">Phone</dt>
-                  <dd className="mt-0.5 text-[var(--foreground)]">
-                    {customer.mobile || customer.phone || "Missing"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="eyebrow">Last Updated</dt>
-                  <dd className="mt-0.5 text-[var(--foreground)]">
-                    {toRelativeTime(customer.updated_at)}
-                  </dd>
-                </div>
-              </dl>
-            </article>
-          ))}
-        </div>
-
         {customers.items.length === 0 ? (
           <div className="surface-card mt-5 p-5">
             <p className="text-base font-semibold text-[var(--foreground)]">No customers matched that query.</p>
@@ -106,7 +60,135 @@ export default async function CustomersPage({
               Try a looser search term or remove filters to inspect the full directory.
             </p>
           </div>
-        ) : null}
+        ) : (
+          <>
+            <div className="mt-4 flex items-end justify-between">
+              <p className="text-sm text-[var(--muted)]">
+                {customers.totalEntries !== null
+                  ? `${customers.totalEntries} total`
+                  : `${customers.items.length} results`}
+                {" · "}Page {customers.page} of {customers.totalPages}
+              </p>
+              <StatusPill
+                label={`${customers.items.length} shown`}
+                tone="berry"
+              />
+            </div>
+
+            <div className="mt-3 overflow-hidden rounded-lg">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Segment</th>
+                    <th>Updated</th>
+                    <th style={{ width: 64 }}>View</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.items.map((customer) => {
+                    const segment =
+                      typeof customer.properties?.lifecycle_segment === "string"
+                        ? customer.properties.lifecycle_segment
+                        : customer.no_email
+                          ? "No email"
+                          : "Active";
+
+                    return (
+                      <tr key={customer.id}>
+                        <td>
+                          <p className="font-semibold text-[var(--foreground)]">
+                            {customer.business_name || customer.fullname}
+                          </p>
+                          {customer.business_name ? (
+                            <p className="mt-0.5 text-xs text-[var(--muted)]">
+                              {customer.fullname}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td>
+                          <p className="text-sm text-[var(--foreground)]">
+                            {customer.email || "—"}
+                          </p>
+                        </td>
+                        <td>
+                          <p className="text-sm text-[var(--foreground)]">
+                            {customer.mobile || customer.phone || "—"}
+                          </p>
+                        </td>
+                        <td>
+                          <StatusPill
+                            label={segment}
+                            tone={customer.no_email ? "slate" : "teal"}
+                          />
+                        </td>
+                        <td>
+                          <p className="text-sm text-[var(--muted)]">
+                            {toRelativeTime(customer.updated_at)}
+                          </p>
+                        </td>
+                        <td>
+                          <Link
+                            href={`/customers/${customer.id}`}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-[var(--accent)] transition hover:bg-[var(--accent-soft)]"
+                            title={`View ${customer.fullname}`}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx={12} cy={12} r={3} />
+                            </svg>
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {customers.totalPages > 1 ? (
+              <div className="mt-4 flex items-center justify-center gap-2">
+                {customers.page > 1 ? (
+                  <Link
+                    href={`/customers?${new URLSearchParams({
+                      ...(query ? { query } : {}),
+                      page: String(customers.page - 1),
+                    }).toString()}`}
+                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                  >
+                    ← Prev
+                  </Link>
+                ) : null}
+                <span className="rounded-md bg-[var(--accent-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--accent)]">
+                  {customers.page} / {customers.totalPages}
+                </span>
+                {customers.page < customers.totalPages ? (
+                  <Link
+                    href={`/customers?${new URLSearchParams({
+                      ...(query ? { query } : {}),
+                      page: String(customers.page + 1),
+                    }).toString()}`}
+                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                  >
+                    Next →
+                  </Link>
+                ) : null}
+              </div>
+            ) : null}
+          </>
+        )}
       </section>
     </>
   );

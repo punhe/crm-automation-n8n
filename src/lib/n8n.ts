@@ -50,6 +50,39 @@ export type N8nExecution = {
   stoppedAt: string | null;
   workflowId: number | string;
   status: N8nExecutionStatus;
+  workflowName?: string;
+};
+
+export type N8nNodeExecution = {
+  startTime: number;
+  executionTime: number;
+  source: unknown[];
+  executionStatus?: string;
+  data?: {
+    main?: Array<Array<{
+      json: Record<string, unknown>;
+      pairedItem?: unknown;
+    }>>;
+  };
+};
+
+export type N8nExecutionDetail = N8nExecution & {
+  data?: {
+    resultData?: {
+      runData?: Record<string, N8nNodeExecution[]>;
+    };
+    startData?: Record<string, unknown>;
+  };
+  workflowData?: {
+    id?: string;
+    name?: string;
+    nodes?: Array<{
+      id: string;
+      name: string;
+      type: string;
+      position: number[];
+    }>;
+  };
 };
 
 type CursorResponse<T> = {
@@ -311,6 +344,59 @@ export async function getWorkflowConsoleData(): Promise<N8nWorkflowConsoleData> 
       recentExecutionsResult.status === "fulfilled" &&
       runningExecutionsResult.status === "fulfilled",
   };
+}
+
+export async function listExecutionsFiltered({
+  status,
+  workflowId,
+  limit = 50,
+}: {
+  status?: N8nExecutionStatus;
+  workflowId?: string;
+  limit?: number;
+} = {}) {
+  await requireUser();
+
+  if (!isN8nConfigured()) {
+    return [];
+  }
+
+  const params: Record<string, string | number | boolean> = {
+    includeData: false,
+    limit,
+  };
+
+  if (status) params.status = status;
+  if (workflowId) params.workflowId = workflowId;
+
+  const payload: CursorResponse<N8nExecution> = await n8nRequest(
+    "/executions",
+    undefined,
+    params,
+  );
+
+  return payload.data ?? [];
+}
+
+export async function getExecutionById(
+  executionId: string,
+): Promise<N8nExecutionDetail | null> {
+  await requireUser();
+
+  if (!isN8nConfigured()) {
+    return null;
+  }
+
+  try {
+    const detail = await n8nRequest<N8nExecutionDetail>(
+      `/executions/${executionId}`,
+      undefined,
+      { includeData: true },
+    );
+    return detail ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function activateWorkflow(workflowId: string) {

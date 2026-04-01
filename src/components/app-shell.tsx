@@ -1,23 +1,19 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   AlarmClockCheck,
-  Bell,
-  Grid3X3,
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
-  Mail,
-  Menu,
-  MessageSquare,
-  Plus,
   ReceiptText,
-  Search,
-  Settings,
+  Shield,
   Users,
   Workflow,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { cn } from "@/lib/format";
 
@@ -27,6 +23,7 @@ const navigation = [
   { href: "/invoices", label: "Invoices", icon: ReceiptText },
   { href: "/recovery", label: "Recovery", icon: AlarmClockCheck },
   { href: "/workflows", label: "Flows", icon: Workflow },
+  { href: "/admin/users", label: "Admin", icon: Shield },
 ];
 
 type AppShellProps = {
@@ -37,6 +34,8 @@ type AppShellProps = {
 
 export function AppShell({ children, mode, mailReady }: AppShellProps) {
   const pathname = usePathname();
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+
   const isAuthRoute =
     pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
   const currentSection =
@@ -56,15 +55,71 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
 
   return (
     <div className="flex min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
-      {/* ── Icon sidebar (Figma Navigation Web / Icons) ── */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[64px] flex-col items-center bg-white py-5 lg:flex">
-        {/* Logo */}
-        <div className="mb-6 flex h-9 w-9 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--accent),#7b8aff)] text-sm font-bold text-white">
-          C
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden overflow-hidden border-r border-[var(--border)] bg-white py-5 transition-[width] duration-200 ease-out lg:flex",
+          isSidebarExpanded ? "w-[232px]" : "w-[64px]",
+        )}
+      >
+        <div
+          className={cn(
+            "flex w-full",
+            isSidebarExpanded
+              ? "items-center justify-between gap-3 px-4"
+              : "flex-col items-center gap-3",
+          )}
+        >
+          <Link
+            href="/"
+            className={cn(
+              "flex items-center gap-3",
+              isSidebarExpanded ? "min-w-0" : "",
+            )}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,var(--accent),#7b8aff)] text-sm font-bold text-white">
+              C
+            </div>
+
+            <div
+              className={cn(
+                "min-w-0 overflow-hidden transition-[max-width,opacity] duration-200",
+                isSidebarExpanded
+                  ? "max-w-[120px] opacity-100"
+                  : "max-w-0 opacity-0",
+              )}
+            >
+              <p className="truncate text-sm font-semibold text-[var(--foreground)]">
+                CRM Console
+              </p>
+              <p className="truncate text-xs text-[var(--muted)]">
+                {mode === "live" ? "Live workspace" : "Demo workspace"}
+              </p>
+            </div>
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setIsSidebarExpanded((current) => !current)}
+            aria-label={
+              isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"
+            }
+            aria-expanded={isSidebarExpanded}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--muted)] transition-colors hover:bg-[var(--panel-soft)] hover:text-[var(--foreground)]"
+          >
+            {isSidebarExpanded ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </button>
         </div>
 
-        {/* Top navigation icons */}
-        <nav className="flex flex-1 flex-col items-center gap-1">
+        <nav
+          className={cn(
+            "mt-6 flex flex-1 flex-col gap-1",
+            isSidebarExpanded ? "px-3" : "items-center",
+          )}
+        >
           {navigation.map(({ href, label, icon: Icon }) => {
             const active =
               href === "/"
@@ -76,40 +131,37 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
                 key={href}
                 href={href}
                 title={label}
-                className={cn("nav-icon-btn", active && "active")}
+                className={cn(
+                  "nav-icon-btn",
+                  isSidebarExpanded
+                    ? "h-11 w-full justify-start gap-3 px-3"
+                    : "h-9 w-9 justify-center",
+                  active && "active",
+                )}
               >
-                <Icon className="h-[20px] w-[20px]" />
+                <Icon className="h-5 w-5 shrink-0" />
+                <span
+                  className={cn(
+                    "overflow-hidden whitespace-nowrap text-sm font-medium transition-[max-width,opacity] duration-150",
+                    isSidebarExpanded
+                      ? "max-w-[120px] opacity-100"
+                      : "max-w-0 opacity-0",
+                  )}
+                >
+                  {label}
+                </span>
               </Link>
             );
           })}
-
-          <div className="my-3 h-px w-6 bg-[var(--border)]" />
-
-          {/* Extra icon slots */}
-          <div className="nav-icon-btn relative">
-            <Bell className="h-[20px] w-[20px]" />
-            <span className="badge-dot badge-dot-pink" />
-          </div>
-          <div className="nav-icon-btn relative">
-            <MessageSquare className="h-[20px] w-[20px]" />
-            <span className="badge-dot badge-dot-blue" />
-          </div>
-          <div className="nav-icon-btn">
-            <Mail className="h-[20px] w-[20px]" />
-          </div>
-          <div className="nav-icon-btn">
-            <Search className="h-[20px] w-[20px]" />
-          </div>
         </nav>
 
-        {/* Bottom icons */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="nav-icon-btn">
-            <Settings className="h-[20px] w-[20px]" />
-          </div>
-
-          {/* User avatar */}
-          <div className="mt-3 relative">
+        <div
+          className={cn(
+            "mt-4 flex w-full items-center border-t border-[var(--border)] pt-4",
+            isSidebarExpanded ? "gap-3 px-4" : "justify-center",
+          )}
+        >
+          <div className="relative shrink-0">
             <UserButton
               appearance={{
                 elements: {
@@ -119,47 +171,44 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
             />
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[var(--accent-mint)]" />
           </div>
-        </div>
 
-        {/* Right edge separator */}
-        <div className="absolute right-0 top-0 h-full w-px bg-[var(--border)]" />
+          <div
+            className={cn(
+              "min-w-0 overflow-hidden transition-[max-width,opacity] duration-150",
+              isSidebarExpanded ? "max-w-[120px] opacity-100" : "max-w-0 opacity-0",
+            )}
+          >
+            <p className="truncate text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--muted)]">
+              Workspace
+            </p>
+            <p className="truncate text-sm font-semibold text-[var(--foreground)]">
+              {mode === "live" ? "Live mode" : "Demo mode"}
+            </p>
+          </div>
+        </div>
       </aside>
 
-      {/* ── Main content area ── */}
-      <div className="flex flex-1 flex-col lg:ml-[64px]">
-        {/* ── Top bar (Figma Navigation Web / Top Bar) ── */}
+      <div
+        className={cn(
+          "flex flex-1 flex-col transition-[margin] duration-200 ease-out",
+          isSidebarExpanded ? "lg:ml-[232px]" : "lg:ml-[64px]",
+        )}
+      >
         <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-white px-4 lg:px-6">
-          <div className="flex items-center gap-3">
-            {/* Mobile menu trigger */}
-            <button className="topbar-btn lg:hidden">
-              <Menu className="h-4 w-4" />
-            </button>
-
-            <div className="topbar-btn hidden lg:flex">
-              <Menu className="h-4 w-4" />
-            </div>
-            <div className="topbar-btn hidden lg:flex">
-              <Plus className="h-4 w-4" />
-            </div>
-            <div className="topbar-btn hidden lg:flex">
-              <Grid3X3 className="h-4 w-4" />
-            </div>
-
-            <h1 className="ml-2 text-lg font-semibold tracking-tight text-[var(--foreground)]">
+          <div className="flex items-center">
+            <h1 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
               {currentSection === "Overview" ? "Dashboard" : currentSection}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Status badges */}
             <span className="hidden items-center gap-1.5 rounded-md bg-[var(--accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] sm:inline-flex">
               {mode === "live" ? "Live" : "Demo"}
             </span>
             <span className="hidden items-center gap-1.5 rounded-md bg-[rgba(124,231,172,0.14)] px-2.5 py-1 text-xs font-medium text-[#2DB77B] sm:inline-flex">
-              {mailReady ? "Mail ✓" : "Mail ✗"}
+              {mailReady ? "Mail ready" : "Mail offline"}
             </span>
 
-            {/* User button (desktop) */}
             <div className="hidden lg:block">
               <UserButton
                 appearance={{
@@ -171,11 +220,9 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
             </div>
           </div>
 
-          {/* Bottom border */}
           <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--border)]" />
         </header>
 
-        {/* ── Mobile bottom nav ── */}
         <nav className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-center justify-around border-t border-[var(--border)] bg-white lg:hidden">
           {navigation.map(({ href, label, icon: Icon }) => {
             const active =
@@ -199,7 +246,6 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
           })}
         </nav>
 
-        {/* ── Page content ── */}
         <main className="flex-1 overflow-y-auto px-4 py-5 pb-20 lg:px-6 lg:pb-6">
           <div className="mx-auto flex max-w-[1180px] flex-col gap-5">
             {children}
