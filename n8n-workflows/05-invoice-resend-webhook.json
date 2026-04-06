@@ -1,0 +1,84 @@
+{
+  "name": "Invoice Resend via Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "resend-invoice",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-resend",
+      "name": "Webhook — Resend Invoice",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "resend-invoice"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst invoiceId = body.invoice_id || body.invoiceId;\nif (!invoiceId) {\n  throw new Error('Missing invoice_id in request body');\n}\n\nreturn [{ json: { invoiceId: String(invoiceId) } }];"
+      },
+      "id": "parse-request",
+      "name": "Parse Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/invoices/{{ $json.invoiceId }}/email",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "resend-email",
+      "name": "Resend Invoice Email via RepairShopr",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 0],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"invoiceId\": \"{{ $('Parse Request').first().json.invoiceId }}\", \"resent\": true }",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [720, 0]
+    }
+  ],
+  "connections": {
+    "Webhook — Resend Invoice": {
+      "main": [[{ "node": "Parse Request", "type": "main", "index": 0 }]]
+    },
+    "Parse Request": {
+      "main": [[{ "node": "Resend Invoice Email via RepairShopr", "type": "main", "index": 0 }]]
+    },
+    "Resend Invoice Email via RepairShopr": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "crm" },
+    { "name": "invoice" },
+    { "name": "webhook" }
+  ]
+}

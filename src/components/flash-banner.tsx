@@ -14,36 +14,7 @@ const flashMap: Record<
     body: "RepairShopr could not queue that invoice email. Check API credentials and permissions.",
     tone: "rose",
   },
-  "reminder-sent": {
-    title: "Reminder email sent",
-    body: "Your custom reminder was delivered through the configured SMTP account.",
-    tone: "teal",
-  },
-  "reminder-failed": {
-    title: "Reminder email failed",
-    body: "The reminder could not be sent. Re-check SMTP credentials and sender rules.",
-    tone: "rose",
-  },
-  "mail-config-missing": {
-    title: "SMTP is not configured",
-    body: "Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS and SMTP_FROM before sending custom reminders.",
-    tone: "amber",
-  },
-  "recipient-missing": {
-    title: "Recipient email missing",
-    body: "This invoice has no reachable customer email, so the reminder was skipped.",
-    tone: "slate",
-  },
-  "invoice-not-found": {
-    title: "Invoice no longer available",
-    body: "RepairShopr did not return an invoice for that request.",
-    tone: "slate",
-  },
-  "invalid-stage": {
-    title: "Invalid reminder stage",
-    body: "The request did not include a valid reminder stage.",
-    tone: "slate",
-  },
+
   "workflow-activated": {
     title: "Workflow published",
     body: "The selected n8n workflow is now active from this console.",

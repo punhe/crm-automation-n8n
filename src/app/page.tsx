@@ -44,7 +44,7 @@ function RevenueChart({ values }: { values: number[] }) {
 
   return (
     <div className="mt-5 rounded-xl bg-[var(--panel-soft)] p-4">
-      <div className="relative h-[200px] overflow-hidden rounded-lg bg-white">
+      <div className="relative h-[200px] overflow-hidden rounded-lg bg-[var(--panel)]">
         <svg
           viewBox="0 0 560 200"
           className="absolute inset-0 h-full w-full"
@@ -114,7 +114,7 @@ function QueueRing({
         className="mx-auto h-[120px] w-[120px] rounded-full p-2.5"
         style={{ background: `conic-gradient(${gradient})` }}
       >
-        <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white text-center">
+        <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[var(--panel)] text-center">
           <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--muted)]">
             Open
           </span>
@@ -194,7 +194,7 @@ export default async function Home({ searchParams }: HomePageProps) {
               </Link>
               <Link
                 href="/invoices?scope=unpaid"
-                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-5 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-5 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
               >
                 Review invoices
               </Link>

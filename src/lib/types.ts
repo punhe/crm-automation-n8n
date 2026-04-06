@@ -34,14 +34,11 @@ export type Invoice = {
   customer?: Customer;
 };
 
-export type ReminderStage =
+export type RecoveryStatus =
   | "due-today"
   | "overdue-3"
   | "overdue-7"
-  | "overdue-14";
-
-export type RecoveryStatus =
-  | ReminderStage
+  | "overdue-14"
   | "watch"
   | "paid"
   | "missing-due-date";

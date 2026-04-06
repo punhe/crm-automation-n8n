@@ -1,0 +1,157 @@
+{
+  "name": "Weekly Revenue Summary Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtDay": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-weekly",
+      "name": "Every Monday at 8 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/invoices",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "unpaid", "value": "true" },
+            { "name": "page", "value": "1" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "fetch-unpaid",
+      "name": "Fetch All Unpaid Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, -100],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/invoices",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "paid", "value": "true" },
+            { "name": "page", "value": "1" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "fetch-paid",
+      "name": "Fetch Recent Paid Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 100],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByPosition": true,
+        "options": {}
+      },
+      "id": "merge-data",
+      "name": "Merge Invoice Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst unpaidData = inputs[0]?.json || {};\nconst paidData = inputs[1]?.json || {};\n\nconst unpaidInvoices = unpaidData.invoices || [];\nconst paidInvoices = paidData.invoices || [];\nconst today = new Date();\n\n// Calculate totals\nconst outstandingTotal = unpaidInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);\nconst paidTotal = paidInvoices.reduce((sum, inv) => sum + parseFloat(inv.total || '0'), 0);\n\n// Classify overdue buckets\nlet dueToday = 0, overdue3 = 0, overdue7 = 0, overdue14 = 0;\nunpaidInvoices.forEach(inv => {\n  if (!inv.due_date) return;\n  const diff = Math.floor((today - new Date(inv.due_date)) / (1000*60*60*24));\n  if (diff >= 14) overdue14++;\n  else if (diff >= 7) overdue7++;\n  else if (diff >= 3) overdue3++;\n  else if (diff === 0) dueToday++;\n});\n\nreturn [{\n  json: {\n    unpaidCount: unpaidInvoices.length,\n    outstandingTotal: outstandingTotal.toFixed(2),\n    paidThisWeek: paidInvoices.length,\n    paidTotal: paidTotal.toFixed(2),\n    dueToday,\n    overdue3,\n    overdue7,\n    overdue14,\n    totalOverdue: overdue3 + overdue7 + overdue14,\n    reportDate: today.toISOString().split('T')[0]\n  }\n}];"
+      },
+      "id": "compute-summary",
+      "name": "Compute Revenue Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$env.SMTP_USER}}",
+        "subject": "=📊 Weekly Revenue Report — {{ $json.reportDate }}",
+        "emailType": "html",
+        "html": "=<div style=\"font-family:Arial,sans-serif;background:#f5f3ff;padding:32px;color:#1f2a26\"><div style=\"max-width:640px;margin:0 auto;background:#fff;border:1px solid #ddd6fe;border-radius:24px;padding:32px\"><p style=\"font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:#7c3aed;margin:0 0 16px\">📊 Weekly Revenue Report</p><h1 style=\"font-size:24px;margin:0 0 20px;line-height:1.15;color:#4c1d95\">Report for {{ $json.reportDate }}</h1><div style=\"display:flex;gap:16px;margin:0 0 24px\"><div style=\"flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:16px;text-align:center\"><p style=\"margin:0 0 4px;font-size:13px;color:#166534\">Paid This Week</p><p style=\"margin:0;font-size:28px;font-weight:bold;color:#15803d\">{{ $json.paidThisWeek }}</p><p style=\"margin:4px 0 0;font-size:14px;color:#166534\">${{ $json.paidTotal }}</p></div><div style=\"flex:1;background:#fef2f2;border:1px solid #fecaca;border-radius:16px;padding:16px;text-align:center\"><p style=\"margin:0 0 4px;font-size:13px;color:#991b1b\">Outstanding</p><p style=\"margin:0;font-size:28px;font-weight:bold;color:#dc2626\">{{ $json.unpaidCount }}</p><p style=\"margin:4px 0 0;font-size:14px;color:#991b1b\">${{ $json.outstandingTotal }}</p></div></div><h2 style=\"font-size:18px;margin:0 0 12px;color:#4c1d95\">Recovery Pipeline</h2><table style=\"width:100%;border-collapse:collapse;margin:0 0 20px\"><tr style=\"background:#f9fafb\"><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px\">🟡 Due Today</td><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;text-align:right;font-weight:bold\">{{ $json.dueToday }}</td></tr><tr><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px\">🟠 3+ Days Overdue</td><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;text-align:right;font-weight:bold\">{{ $json.overdue3 }}</td></tr><tr style=\"background:#f9fafb\"><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px\">🔴 7+ Days Overdue</td><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;text-align:right;font-weight:bold\">{{ $json.overdue7 }}</td></tr><tr><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px\">🚨 14+ Days Overdue</td><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;text-align:right;font-weight:bold\">{{ $json.overdue14 }}</td></tr><tr style=\"background:#fef2f2\"><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;font-weight:bold\">Total Overdue</td><td style=\"padding:10px 14px;border:1px solid #e5e7eb;font-size:14px;text-align:right;font-weight:bold;color:#dc2626\">{{ $json.totalOverdue }}</td></tr></table><p style=\"font-size:13px;color:#6b7280;margin:0\">Generated automatically by RepairShopr Revenue Console × n8n</p></div></div>",
+        "options": {}
+      },
+      "id": "send-report",
+      "name": "Send Weekly Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [960, 0],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Monday at 8 AM": {
+      "main": [
+        [
+          { "node": "Fetch All Unpaid Invoices", "type": "main", "index": 0 },
+          { "node": "Fetch Recent Paid Invoices", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch All Unpaid Invoices": {
+      "main": [[{ "node": "Merge Invoice Data", "type": "main", "index": 0 }]]
+    },
+    "Fetch Recent Paid Invoices": {
+      "main": [[{ "node": "Merge Invoice Data", "type": "main", "index": 1 }]]
+    },
+    "Merge Invoice Data": {
+      "main": [[{ "node": "Compute Revenue Summary", "type": "main", "index": 0 }]]
+    },
+    "Compute Revenue Summary": {
+      "main": [[{ "node": "Send Weekly Report Email", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "crm" },
+    { "name": "reporting" },
+    { "name": "email" }
+  ]
+}

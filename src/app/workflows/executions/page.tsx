@@ -137,7 +137,7 @@ export default async function ExecutionsPage({
 
           <Link
             href="/workflows"
-            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-4 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
           >
             ← Back to Flows
           </Link>
@@ -264,7 +264,7 @@ export default async function ExecutionsPage({
                       <td>
                         <Link
                           href={`/workflows/executions/${execution.id}`}
-                          className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--accent)] transition hover:bg-[var(--accent-soft)]"
+                          className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 text-xs font-semibold text-[var(--accent)] transition hover:bg-[var(--accent-soft)]"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

@@ -4,7 +4,6 @@ import type {
   Invoice,
   RecoveryInvoice,
   RecoveryStatus,
-  ReminderStage,
 } from "@/lib/types";
 
 export function getReminderStatus(invoice: Invoice): RecoveryStatus {
@@ -102,18 +101,6 @@ export function getStageTone(status: RecoveryStatus) {
   }
 }
 
-export function getReminderSubject(invoiceNumber: string, stage: ReminderStage) {
-  switch (stage) {
-    case "due-today":
-      return `Invoice ${invoiceNumber} is due today`;
-    case "overdue-3":
-      return `Reminder: Invoice ${invoiceNumber} is 3 days overdue`;
-    case "overdue-7":
-      return `Action needed: Invoice ${invoiceNumber} is 7 days overdue`;
-    case "overdue-14":
-      return `Final reminder: Invoice ${invoiceNumber} is 14 days overdue`;
-  }
-}
 
 export function getRecoveryBuckets(invoices: RecoveryInvoice[]) {
   return {

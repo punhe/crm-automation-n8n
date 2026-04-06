@@ -49,7 +49,7 @@ export default async function InvoicesPage({
                 className={`inline-flex min-h-9 items-center justify-center rounded-lg px-4 text-sm font-semibold transition ${
                   item.active
                     ? "bg-[var(--accent)] text-white"
-                    : "border border-[var(--border)] bg-white text-[var(--foreground)] hover:bg-[var(--panel-soft)]"
+                    : "border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)] hover:bg-[var(--panel-soft)]"
                 }`}
               >
                 {item.label}

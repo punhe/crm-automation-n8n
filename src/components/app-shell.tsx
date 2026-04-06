@@ -29,10 +29,9 @@ const navigation = [
 type AppShellProps = {
   children: React.ReactNode;
   mode: "live" | "demo";
-  mailReady: boolean;
 };
 
-export function AppShell({ children, mode, mailReady }: AppShellProps) {
+export function AppShell({ children, mode }: AppShellProps) {
   const pathname = usePathname();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
@@ -57,7 +56,7 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
     <div className="flex min-h-screen bg-[var(--background)] text-[color:var(--foreground)]">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 hidden overflow-hidden border-r border-[var(--border)] bg-white py-5 transition-[width] duration-200 ease-out lg:flex",
+          "fixed inset-y-0 left-0 z-40 hidden overflow-hidden border-r border-[var(--border)] bg-[var(--panel)] py-5 transition-[width] duration-200 ease-out lg:flex flex-col",
           isSidebarExpanded ? "w-[232px]" : "w-[64px]",
         )}
       >
@@ -169,7 +168,7 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
                 },
               }}
             />
-            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[var(--accent-mint)]" />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[var(--panel)] bg-[var(--accent-mint)]" />
           </div>
 
           <div
@@ -194,7 +193,7 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
           isSidebarExpanded ? "lg:ml-[232px]" : "lg:ml-[64px]",
         )}
       >
-        <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-white px-4 lg:px-6">
+        <header className="header-blur sticky top-0 z-30 flex h-[56px] items-center justify-between border-b border-[var(--border)] px-4 lg:px-6">
           <div className="flex items-center">
             <h1 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">
               {currentSection === "Overview" ? "Dashboard" : currentSection}
@@ -204,9 +203,6 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
           <div className="flex items-center gap-3">
             <span className="hidden items-center gap-1.5 rounded-md bg-[var(--accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--accent)] sm:inline-flex">
               {mode === "live" ? "Live" : "Demo"}
-            </span>
-            <span className="hidden items-center gap-1.5 rounded-md bg-[rgba(124,231,172,0.14)] px-2.5 py-1 text-xs font-medium text-[#2DB77B] sm:inline-flex">
-              {mailReady ? "Mail ready" : "Mail offline"}
             </span>
 
             <div className="hidden lg:block">
@@ -220,10 +216,10 @@ export function AppShell({ children, mode, mailReady }: AppShellProps) {
             </div>
           </div>
 
-          <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--border)]" />
+
         </header>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-center justify-around border-t border-[var(--border)] bg-white lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-center justify-around border-t border-[var(--border)] bg-[var(--panel)] backdrop-blur-md lg:hidden">
           {navigation.map(({ href, label, icon: Icon }) => {
             const active =
               href === "/"

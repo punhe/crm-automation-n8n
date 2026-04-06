@@ -1,11 +1,11 @@
-import { resendInvoiceEmailAction, sendReminderEmailAction } from "@/app/actions";
+import { resendInvoiceEmailAction } from "@/app/actions";
 import { ActionButton } from "@/components/action-button";
 import { FlashBanner } from "@/components/flash-banner";
 import { StatusPill } from "@/components/status-pill";
 import { toCurrency, toDateLabel } from "@/lib/format";
 import { getRecoveryBuckets, getStageLabel, getStageTone } from "@/lib/reminders";
 import { getRecoveryQueue } from "@/lib/repairshopr";
-import type { RecoveryInvoice, ReminderStage } from "@/lib/types";
+import type { RecoveryInvoice } from "@/lib/types";
 
 type RecoveryPageProps = {
   searchParams: Promise<{ flash?: string | string[] }>;
@@ -16,13 +16,11 @@ function RecoverySection({
   description,
   invoices,
   returnTo,
-  reminderStage,
 }: {
   title: string;
   description: string;
   invoices: RecoveryInvoice[];
   returnTo: string;
-  reminderStage?: ReminderStage;
 }) {
   if (invoices.length === 0) {
     return null;
@@ -81,18 +79,6 @@ function RecoverySection({
                   Recipient: {invoice.recipientEmail || "Resolve from invoice detail"}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {reminderStage ? (
-                    <form action={sendReminderEmailAction}>
-                      <input type="hidden" name="invoiceId" value={invoice.id} />
-                      <input type="hidden" name="stage" value={reminderStage} />
-                      <input type="hidden" name="returnTo" value={returnTo} />
-                      <ActionButton
-                        label="Send reminder"
-                        pendingLabel="Sending..."
-                      />
-                    </form>
-                  ) : null}
-
                   <form action={resendInvoiceEmailAction}>
                     <input type="hidden" name="invoiceId" value={invoice.id} />
                     <input type="hidden" name="returnTo" value={returnTo} />
@@ -126,9 +112,8 @@ export default async function RecoveryPage({ searchParams }: RecoveryPageProps) 
           Run billing follow-up from one quiet, email-first queue.
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted)]">
-          Each section below represents a reminder moment. Use the custom reminder
-          button when you want softer tone control, or resend the native invoice
-          email directly from RepairShopr when speed matters more than wording.
+          Each section below represents a reminder moment. You can resend 
+          the native invoice email directly from RepairShopr to trigger an automation.
         </p>
       </section>
 
@@ -139,28 +124,24 @@ export default async function RecoveryPage({ searchParams }: RecoveryPageProps) 
         description="Friendly nudge before the balance slips late."
         invoices={buckets.dueToday}
         returnTo={returnTo}
-        reminderStage="due-today"
       />
       <RecoverySection
         title="3+ days overdue"
         description="Invoices that need a first firm follow-up."
         invoices={buckets.overdue3}
         returnTo={returnTo}
-        reminderStage="overdue-3"
       />
       <RecoverySection
         title="7+ days overdue"
         description="Higher-risk balances that deserve attention this week."
         invoices={buckets.overdue7}
         returnTo={returnTo}
-        reminderStage="overdue-7"
       />
       <RecoverySection
         title="14+ days overdue"
         description="Final reminders before you escalate manually."
         invoices={buckets.overdue14}
         returnTo={returnTo}
-        reminderStage="overdue-14"
       />
       <RecoverySection
         title="Missing due date"

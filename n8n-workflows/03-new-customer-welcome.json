@@ -1,0 +1,111 @@
+{
+  "name": "New Customer — Welcome Email",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "new-customer",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-new-customer",
+      "name": "Webhook — New Customer",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "new-customer"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst customerId = body.customer_id || body.id;\nconst fullname = body.fullname || body.firstname + ' ' + (body.lastname || '');\nconst businessName = body.business_name || '';\nconst email = (body.email || '').trim();\nconst noEmail = body.no_email || false;\n\nif (!customerId) {\n  throw new Error('Missing customer_id in webhook payload');\n}\n\nreturn [{\n  json: {\n    customerId,\n    fullname: fullname.trim(),\n    businessName,\n    displayName: businessName || fullname.trim(),\n    email,\n    noEmail,\n    createdAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "parse-customer",
+      "name": "Parse Customer Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            {
+              "id": "has-email",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            },
+            {
+              "id": "email-not-blocked",
+              "leftValue": "={{ $json.noEmail }}",
+              "rightValue": "false",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "filter-email",
+      "name": "Customer Has Email?",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{ $json.email }}",
+        "subject": "=Welcome to SelectTech, {{ $json.displayName }}!",
+        "emailType": "html",
+        "html": "=<div style=\"font-family:Arial,sans-serif;background:#f0f4ff;padding:32px;color:#1f2a26\"><div style=\"max-width:640px;margin:0 auto;background:#fff;border:1px solid #d4daf0;border-radius:24px;padding:32px\"><p style=\"font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:#5b6abf;margin:0 0 16px\">Welcome Aboard 🎉</p><h1 style=\"font-size:28px;margin:0 0 14px;line-height:1.15;color:#2d3a8c\">Hi {{ $json.displayName }},</h1><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">Thank you for choosing us! We're excited to have you as a customer.</p><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">Here's what you can expect from us:</p><ul style=\"font-size:15px;line-height:2;margin:0 0 20px;padding-left:20px\"><li>Quick turnaround on all repair jobs</li><li>Transparent pricing with detailed invoices</li><li>Easy online payment options</li><li>Dedicated support via email and phone</li></ul><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">If you have any questions, don't hesitate to reply to this email — we're here to help.</p><p style=\"font-size:16px;line-height:1.7;margin:0\">Best regards,<br/><strong>The SelectTech Team</strong></p></div></div>",
+        "options": {}
+      },
+      "id": "send-welcome",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [720, 0],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"welcomed\": true }",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 0]
+    }
+  ],
+  "connections": {
+    "Webhook — New Customer": {
+      "main": [[{ "node": "Parse Customer Data", "type": "main", "index": 0 }]]
+    },
+    "Parse Customer Data": {
+      "main": [[{ "node": "Customer Has Email?", "type": "main", "index": 0 }]]
+    },
+    "Customer Has Email?": {
+      "main": [[{ "node": "Send Welcome Email", "type": "main", "index": 0 }]]
+    },
+    "Send Welcome Email": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "crm" },
+    { "name": "onboarding" },
+    { "name": "email" }
+  ]
+}

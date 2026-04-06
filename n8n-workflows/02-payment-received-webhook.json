@@ -1,0 +1,159 @@
+{
+  "name": "Payment Received — Webhook Listener",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "repairshopr-payment",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook — Payment Received",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "repairshopr-payment"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\n// RepairShopr webhook payload structure\nconst invoiceId = body.invoice_id || body.id;\nconst paymentAmount = body.amount || body.payment_amount || 0;\nconst paymentMethod = body.payment_method || 'unknown';\nconst customerId = body.customer_id;\nconst invoiceNumber = body.invoice_number || body.number || '';\nconst customerName = body.customer_business_then_name || body.customer_name || '';\n\nif (!invoiceId) {\n  throw new Error('Missing invoice_id in webhook payload');\n}\n\nreturn [{\n  json: {\n    invoiceId,\n    invoiceNumber,\n    paymentAmount,\n    paymentMethod,\n    customerId,\n    customerName,\n    receivedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "parse-webhook",
+      "name": "Parse Payment Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/invoices/{{ $json.invoiceId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "verify-invoice",
+      "name": "Verify Invoice in RepairShopr",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 0],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            {
+              "id": "is-paid",
+              "leftValue": "={{ $json.invoice.is_paid }}",
+              "rightValue": "true",
+              "operator": { "type": "boolean", "operation": "true" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-paid-status",
+      "name": "Invoice Fully Paid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$env.SMTP_USER}}",
+        "subject": "=✅ Payment Received — Invoice {{ $('Parse Payment Data').first().json.invoiceNumber }}",
+        "emailType": "html",
+        "html": "=<div style=\"font-family:Arial,sans-serif;background:#f0faf4;padding:32px;color:#1f2a26\"><div style=\"max-width:640px;margin:0 auto;background:#fff;border:1px solid #c8e6d0;border-radius:24px;padding:32px\"><p style=\"font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:#3d8b5e;margin:0 0 16px\">✅ Payment Confirmation</p><h1 style=\"font-size:24px;margin:0 0 14px;line-height:1.15;color:#1a5632\">Payment received for Invoice {{ $('Parse Payment Data').first().json.invoiceNumber }}</h1><div style=\"border:1px solid #d4edda;border-radius:18px;padding:18px 20px;background:#f0faf4;margin:0 0 20px\"><p style=\"margin:0 0 8px;font-size:14px\"><strong>Customer:</strong> {{ $('Parse Payment Data').first().json.customerName }}</p><p style=\"margin:0 0 8px;font-size:14px\"><strong>Amount:</strong> ${{ $('Parse Payment Data').first().json.paymentAmount }}</p><p style=\"margin:0 0 8px;font-size:14px\"><strong>Method:</strong> {{ $('Parse Payment Data').first().json.paymentMethod }}</p><p style=\"margin:0;font-size:14px\"><strong>Received:</strong> {{ $('Parse Payment Data').first().json.receivedAt }}</p></div><p style=\"font-size:14px;color:#6b7280\">This invoice is now marked as fully paid in RepairShopr.</p></div></div>",
+        "options": {}
+      },
+      "id": "notify-team-paid",
+      "name": "Notify Team — Payment Received",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [960, -100],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$env.SMTP_USER}}",
+        "subject": "=⚠️ Partial Payment — Invoice {{ $('Parse Payment Data').first().json.invoiceNumber }}",
+        "emailType": "html",
+        "html": "=<div style=\"font-family:Arial,sans-serif;background:#fffbeb;padding:32px;color:#1f2a26\"><div style=\"max-width:640px;margin:0 auto;background:#fff;border:1px solid #fde68a;border-radius:24px;padding:32px\"><p style=\"font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:#b45309;margin:0 0 16px\">⚠️ Partial Payment</p><h1 style=\"font-size:24px;margin:0 0 14px;line-height:1.15;color:#92400e\">Partial payment for Invoice {{ $('Parse Payment Data').first().json.invoiceNumber }}</h1><div style=\"border:1px solid #fde68a;border-radius:18px;padding:18px 20px;background:#fffbeb;margin:0 0 20px\"><p style=\"margin:0 0 8px;font-size:14px\"><strong>Customer:</strong> {{ $('Parse Payment Data').first().json.customerName }}</p><p style=\"margin:0 0 8px;font-size:14px\"><strong>Amount paid:</strong> ${{ $('Parse Payment Data').first().json.paymentAmount }}</p><p style=\"margin:0;font-size:14px\"><strong>Received:</strong> {{ $('Parse Payment Data').first().json.receivedAt }}</p></div><p style=\"font-size:14px;color:#6b7280\">This invoice still has an outstanding balance. Check RepairShopr for details.</p></div></div>",
+        "options": {}
+      },
+      "id": "notify-team-partial",
+      "name": "Notify Team — Partial Payment",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [960, 100],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"processed\": true }",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1200, 0]
+    }
+  ],
+  "connections": {
+    "Webhook — Payment Received": {
+      "main": [[{ "node": "Parse Payment Data", "type": "main", "index": 0 }]]
+    },
+    "Parse Payment Data": {
+      "main": [[{ "node": "Verify Invoice in RepairShopr", "type": "main", "index": 0 }]]
+    },
+    "Verify Invoice in RepairShopr": {
+      "main": [[{ "node": "Invoice Fully Paid?", "type": "main", "index": 0 }]]
+    },
+    "Invoice Fully Paid?": {
+      "main": [
+        [{ "node": "Notify Team — Payment Received", "type": "main", "index": 0 }],
+        [{ "node": "Notify Team — Partial Payment", "type": "main", "index": 0 }]
+      ]
+    },
+    "Notify Team — Payment Received": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Notify Team — Partial Payment": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "crm" },
+    { "name": "webhook" },
+    { "name": "payment" }
+  ]
+}

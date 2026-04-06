@@ -1,0 +1,172 @@
+{
+  "name": "Daily Invoice Recovery — Auto Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every Day at 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/invoices",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "unpaid", "value": "true" },
+            { "name": "page", "value": "1" }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "fetch-unpaid-invoices",
+      "name": "Fetch Unpaid Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoices = $input.first().json.invoices || [];\nconst today = new Date();\n\nconst results = invoices.map(inv => {\n  const dueDate = inv.due_date ? new Date(inv.due_date) : null;\n  let daysOverdue = null;\n  let stage = 'watch';\n\n  if (dueDate) {\n    const diffMs = today.getTime() - dueDate.getTime();\n    daysOverdue = Math.floor(diffMs / (1000 * 60 * 60 * 24));\n\n    if (daysOverdue >= 14) stage = 'overdue-14';\n    else if (daysOverdue >= 7) stage = 'overdue-7';\n    else if (daysOverdue >= 3) stage = 'overdue-3';\n    else if (daysOverdue === 0) stage = 'due-today';\n    else stage = 'watch';\n  } else {\n    stage = 'missing-due-date';\n  }\n\n  return {\n    json: {\n      invoiceId: inv.id,\n      invoiceNumber: inv.number,\n      customerId: inv.customer_id,\n      customerName: inv.customer_business_then_name,\n      total: inv.total,\n      dueDate: inv.due_date,\n      daysOverdue,\n      stage,\n      pdfUrl: inv.pdf_url || null\n    }\n  };\n});\n\nreturn results.filter(r => ['due-today','overdue-3','overdue-7','overdue-14'].includes(r.json.stage));"
+      },
+      "id": "classify-overdue",
+      "name": "Classify Overdue Stage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://{{$env.REPAIRSHOPR_SUBDOMAIN}}.repairshopr.com/api/v1/customers/{{ $json.customerId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "options": {
+          "response": {
+            "response": { "responseFormat": "json" }
+          }
+        }
+      },
+      "id": "fetch-customer-detail",
+      "name": "Fetch Customer Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 0],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "RepairShopr API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const customer = $input.first().json.customer || {};\nconst prev = $('Classify Overdue Stage').first().json;\n\nlet recipientEmail = (customer.email || '').trim();\nif (!recipientEmail && customer.contacts) {\n  const contact = customer.contacts.find(c => c.email);\n  if (contact) recipientEmail = contact.email.trim();\n}\n\nconst stageMessages = {\n  'due-today': {\n    subject: `Invoice ${prev.invoiceNumber} is due today`,\n    headline: 'A quick reminder that your invoice is due today.',\n    closing: \"If you've already scheduled payment, you can ignore this note.\"\n  },\n  'overdue-3': {\n    subject: `Reminder: Invoice ${prev.invoiceNumber} is 3 days overdue`,\n    headline: 'Your invoice is now 3 days overdue.',\n    closing: 'Please reply if anything is blocking payment and we will help immediately.'\n  },\n  'overdue-7': {\n    subject: `Action needed: Invoice ${prev.invoiceNumber} is 7 days overdue`,\n    headline: 'Your invoice is now 7 days overdue and needs attention.',\n    closing: 'Please confirm payment timing so we can keep your account in a healthy state.'\n  },\n  'overdue-14': {\n    subject: `Final reminder: Invoice ${prev.invoiceNumber} is 14 days overdue`,\n    headline: 'This is the final reminder before we escalate internally.',\n    closing: 'Please reply today with a payment update or remittance confirmation.'\n  }\n};\n\nconst msg = stageMessages[prev.stage];\n\nreturn [{\n  json: {\n    ...prev,\n    recipientEmail,\n    customerName: customer.business_name || customer.fullname || prev.customerName,\n    noEmail: customer.no_email || false,\n    subject: msg ? msg.subject : `Invoice ${prev.invoiceNumber} reminder`,\n    headline: msg ? msg.headline : 'You have an outstanding invoice.',\n    closing: msg ? msg.closing : 'Please arrange payment at your earliest convenience.'\n  }\n}];"
+      },
+      "id": "build-email-payload",
+      "name": "Build Email Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "" },
+          "conditions": [
+            {
+              "id": "has-email",
+              "leftValue": "={{ $json.recipientEmail }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "isNotEmpty" }
+            },
+            {
+              "id": "not-blocked",
+              "leftValue": "={{ $json.noEmail }}",
+              "rightValue": "false",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "filter-has-email",
+      "name": "Has Valid Email?",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [1200, 0]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{ $json.recipientEmail }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "html": "=<div style=\"font-family:Arial,sans-serif;background:#fffaf1;padding:32px;color:#1f2a26\"><div style=\"max-width:640px;margin:0 auto;background:#fff;border:1px solid #e7dccb;border-radius:24px;padding:32px\"><p style=\"font-size:12px;text-transform:uppercase;letter-spacing:.24em;color:#7a6d58;margin:0 0 16px\">RepairShopr Revenue Console</p><h1 style=\"font-size:28px;margin:0 0 14px;line-height:1.15\">{{ $json.headline }}</h1><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">Hi {{ $json.customerName }},</p><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">We wanted to follow up on invoice <strong>{{ $json.invoiceNumber }}</strong> for <strong>${{ $json.total }}</strong>, with a due date of <strong>{{ $json.dueDate }}</strong>.</p><div style=\"border:1px solid #efe6d8;border-radius:18px;padding:18px 20px;background:#fbf6ec;margin:0 0 20px\"><p style=\"margin:0 0 8px;font-size:14px\"><strong>Invoice number:</strong> {{ $json.invoiceNumber }}</p><p style=\"margin:0 0 8px;font-size:14px\"><strong>Amount:</strong> ${{ $json.total }}</p><p style=\"margin:0;font-size:14px\"><strong>Due date:</strong> {{ $json.dueDate }}</p></div><p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">{{ $json.closing }}</p>{{ $json.pdfUrl ? '<p style=\"font-size:16px;line-height:1.7;margin:0 0 20px\">Invoice copy: <a href=\"' + $json.pdfUrl + '\" style=\"color:#0d6a6e\">' + $json.pdfUrl + '</a></p>' : '' }}<p style=\"font-size:16px;line-height:1.7;margin:0\">Thank you,<br/>Billing Team</p></div></div>",
+        "options": {}
+      },
+      "id": "send-reminder-email",
+      "name": "Send Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1440, 0],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_SMTP_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Every Day at 9 AM": {
+      "main": [[{ "node": "Fetch Unpaid Invoices", "type": "main", "index": 0 }]]
+    },
+    "Fetch Unpaid Invoices": {
+      "main": [[{ "node": "Classify Overdue Stage", "type": "main", "index": 0 }]]
+    },
+    "Classify Overdue Stage": {
+      "main": [[{ "node": "Fetch Customer Email", "type": "main", "index": 0 }]]
+    },
+    "Fetch Customer Email": {
+      "main": [[{ "node": "Build Email Payload", "type": "main", "index": 0 }]]
+    },
+    "Build Email Payload": {
+      "main": [[{ "node": "Has Valid Email?", "type": "main", "index": 0 }]]
+    },
+    "Has Valid Email?": {
+      "main": [[{ "node": "Send Reminder Email", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "crm" },
+    { "name": "invoice-recovery" },
+    { "name": "email" }
+  ]
+}

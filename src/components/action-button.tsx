@@ -26,7 +26,7 @@ export function ActionButton({
         variant === "primary" &&
           "bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)]",
         variant === "secondary" &&
-          "border border-[var(--border)] bg-white text-[var(--foreground)] hover:bg-[var(--panel-soft)]",
+          "border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)] hover:bg-[var(--panel-soft)]",
         variant === "ghost" &&
           "bg-transparent text-[var(--muted)] hover:bg-[var(--panel-soft)] hover:text-[var(--foreground)]",
       )}

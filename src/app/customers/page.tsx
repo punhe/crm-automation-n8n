@@ -132,7 +132,7 @@ export default async function CustomersPage({
                         <td>
                           <Link
                             href={`/customers/${customer.id}`}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-[var(--accent)] transition hover:bg-[var(--accent-soft)]"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel)] text-[var(--accent)] transition hover:bg-[var(--accent-soft)]"
                             title={`View ${customer.fullname}`}
                           >
                             <svg
@@ -166,7 +166,7 @@ export default async function CustomersPage({
                       ...(query ? { query } : {}),
                       page: String(customers.page - 1),
                     }).toString()}`}
-                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
                   >
                     ← Prev
                   </Link>
@@ -180,7 +180,7 @@ export default async function CustomersPage({
                       ...(query ? { query } : {}),
                       page: String(customers.page + 1),
                     }).toString()}`}
-                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
                   >
                     Next →
                   </Link>

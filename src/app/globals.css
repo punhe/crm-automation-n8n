@@ -32,6 +32,35 @@
   --tag-yellow-text: #C49332;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #101014;
+    --background-strong: #18181C;
+    --foreground: #EAEAF0;
+    --foreground-soft: #C5C5D0;
+    --muted: #6B6B8A;
+    --border: #2A2A34;
+    --panel: #1A1A22;
+    --panel-strong: #1E1E28;
+    --panel-soft: #222230;
+    --accent: #7B96F8;
+    --accent-strong: #5E81F4;
+    --accent-soft: rgba(94, 129, 244, 0.14);
+    --accent-mint: #5DD89A;
+    --accent-amber: #E8AD4A;
+    --accent-rose: #FF6B78;
+    --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.32);
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.24);
+    --progress-high: #FF6B78;
+    --progress-primary: #7B96F8;
+    --progress-low: #5DD89A;
+    --tag-green-bg: rgba(93, 216, 154, 0.14);
+    --tag-green-text: #5DD89A;
+    --tag-yellow-bg: rgba(232, 173, 74, 0.14);
+    --tag-yellow-text: #E8AD4A;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -45,6 +74,7 @@
 
 html {
   background: var(--background);
+  color-scheme: light dark;
 }
 
 body {
@@ -67,7 +97,7 @@ a {
   background: var(--panel);
   border-radius: 12px;
   box-shadow: var(--shadow-panel);
-  border: none;
+  border: 1px solid var(--border);
 }
 
 /* ---- Eyebrow label ---- */
@@ -149,7 +179,22 @@ a {
   border-radius: 12px;
   background: var(--panel);
   box-shadow: var(--shadow-card);
-  border: none;
+  border: 1px solid var(--border);
+}
+
+/* ---- Sticky header blur ---- */
+.header-blur {
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
+}
+
+/* ---- Horizontal scroll wrapper ---- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 /* ---- Grid pattern for charts ---- */

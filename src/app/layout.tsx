@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { IBM_Plex_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
-import { isMailConfigured } from "@/lib/env";
+
 import { getConnectionMode } from "@/lib/repairshopr";
 import "./globals.css";
 
@@ -34,8 +34,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const mode = getConnectionMode();
-  const mailReady = isMailConfigured();
-
   return (
     <html
       lang="en"
@@ -44,7 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <ClerkProvider>
-          <AppShell mode={mode} mailReady={mailReady}>
+          <AppShell mode={mode}>
             {children}
           </AppShell>
         </ClerkProvider>

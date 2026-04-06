@@ -12,7 +12,7 @@ const tones: Record<NonNullable<StatusPillProps["tone"]>, string> = {
   rose: "bg-[rgba(255,128,139,0.16)] text-[#D94452]",
   berry: "bg-[rgba(94,129,244,0.14)] text-[var(--accent)]",
   sage: "bg-[rgba(124,231,172,0.14)] text-[#2DB77B]",
-  slate: "bg-[rgba(129,129,165,0.14)] text-[#6B6B8D]",
+  slate: "bg-[rgba(129,129,165,0.14)] text-[var(--muted)]",
 };
 
 export function StatusPill({ label, tone = "sage" }: StatusPillProps) {
