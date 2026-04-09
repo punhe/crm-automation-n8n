@@ -15,15 +15,15 @@ export default function SignUpPage() {
               rootBox: "w-full",
               cardBox: "w-full",
               card: "w-full border-0 bg-transparent p-0 shadow-none",
-              headerTitle: "text-[24px] font-bold tracking-tight text-[#1C1D21]",
-              headerSubtitle: "text-sm leading-6 text-[#8181A5]",
+              headerTitle: "text-[24px] font-[400] tracking-tight text-[var(--foreground)]",
+              headerSubtitle: "text-sm leading-6 text-[var(--muted)]",
               socialButtonsBlockButton:
-                "h-10 rounded-lg border border-[#ECECF2] bg-white text-[#1C1D21] shadow-none hover:bg-[#F5F5FA]",
+                "h-10 rounded-full border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)] shadow-none hover:bg-[var(--panel-soft)]",
               formFieldInput:
-                "h-10 rounded-lg border border-[#ECECF2] bg-white text-[#1C1D21] shadow-none focus:border-[#5E81F4] focus:ring-2 focus:ring-[rgba(94,129,244,0.12)]",
+                "h-10 rounded-lg border border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)] shadow-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent-soft)]",
               formButtonPrimary:
-                "h-10 rounded-lg bg-[#5E81F4] text-white hover:bg-[#4A6DE0]",
-              footerActionLink: "text-[#5E81F4] hover:text-[#4A6DE0]",
+                "h-10 rounded-full bg-[var(--btn-primary-bg)] border border-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:brightness-110",
+              footerActionLink: "text-[var(--accent)] hover:text-[var(--accent-strong)]",
             },
           }}
         />

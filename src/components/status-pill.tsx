@@ -6,13 +6,13 @@ type StatusPillProps = {
 };
 
 const tones: Record<NonNullable<StatusPillProps["tone"]>, string> = {
-  teal: "bg-[rgba(124,231,172,0.16)] text-[#2DB77B]",
-  amber: "bg-[rgba(244,190,94,0.16)] text-[#C49332]",
-  orange: "bg-[rgba(244,166,94,0.16)] text-[#C47832]",
-  rose: "bg-[rgba(255,128,139,0.16)] text-[#D94452]",
-  berry: "bg-[rgba(94,129,244,0.14)] text-[var(--accent)]",
-  sage: "bg-[rgba(124,231,172,0.14)] text-[#2DB77B]",
-  slate: "bg-[rgba(129,129,165,0.14)] text-[var(--muted)]",
+  teal: "bg-[var(--tag-green-bg)] text-[var(--tag-green-text)]",
+  amber: "bg-[var(--tag-yellow-bg)] text-[var(--tag-yellow-text)]",
+  orange: "bg-[rgba(232,143,74,0.16)] text-[#e88f4a]",
+  rose: "bg-[rgba(255,107,120,0.16)] text-[#ff6b78]",
+  berry: "bg-[var(--accent-soft)] text-[var(--accent)]",
+  sage: "bg-[var(--tag-green-bg)] text-[var(--tag-green-text)]",
+  slate: "bg-[rgba(137,137,137,0.14)] text-[var(--muted)]",
 };
 
 export function StatusPill({ label, tone = "sage" }: StatusPillProps) {

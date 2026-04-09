@@ -47,7 +47,7 @@ export default async function CustomersPage({
           />
           <button
             type="submit"
-            className="inline-flex min-h-9 items-center justify-center rounded-lg bg-[var(--accent)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--accent-strong)]"
+            className="inline-flex min-h-9 items-center justify-center rounded-full bg-[var(--btn-primary-bg)] border border-[var(--btn-primary-bg)] px-8 text-sm font-semibold text-[var(--btn-primary-text)] transition hover:brightness-110 shadow-sm focus-visible:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
           >
             Search customers
           </button>
@@ -166,7 +166,7 @@ export default async function CustomersPage({
                       ...(query ? { query } : {}),
                       page: String(customers.page - 1),
                     }).toString()}`}
-                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                    className="inline-flex min-h-8 items-center rounded-full border border-[var(--border)] bg-[var(--panel)] px-4 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
                   >
                     ← Prev
                   </Link>
@@ -180,7 +180,7 @@ export default async function CustomersPage({
                       ...(query ? { query } : {}),
                       page: String(customers.page + 1),
                     }).toString()}`}
-                    className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
+                    className="inline-flex min-h-8 items-center rounded-full border border-[var(--border)] bg-[var(--panel)] px-4 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[var(--panel-soft)]"
                   >
                     Next →
                   </Link>

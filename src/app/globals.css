@@ -1,63 +1,84 @@
 @import "tailwindcss";
 
 :root {
-  /* CRM UI Kit Color System — pulled from Figma */
-  --background: #F0F0F3;
-  --background-strong: #E8E8ED;
-  --foreground: #1C1D21;
-  --foreground-soft: #3A3B42;
-  --muted: #8181A5;
-  --border: #ECECF2;
-  --panel: #FFFFFF;
-  --panel-strong: #FFFFFF;
-  --panel-soft: #F5F5FA;
-  --accent: #5E81F4;
-  --accent-strong: #4A6DE0;
-  --accent-soft: rgba(94, 129, 244, 0.10);
-  --accent-mint: #7CE7AC;
-  --accent-amber: #F4BE5E;
-  --accent-rose: #FF808B;
-  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.06);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
+  /* Supabase Light Mode Equivalent */
+  --background: #f8f9fa;
+  --background-strong: #f1f3f5;
+  --foreground: #171717;
+  --foreground-soft: #4d4d4d;
+  --muted: #898989;
+  
+  --border: #e6e8eb;
+  --border-subtle: #f1f3f5;
+  --border-strong: #ced4da;
+  
+  --panel: #ffffff;
+  --panel-strong: #f8f9fa;
+  --panel-soft: #f1f3f5;
+  
+  --btn-primary-bg: #171717;
+  --btn-primary-text: #ffffff;
+  
+  --accent: #3ecf8e;
+  --accent-strong: #00c573;
+  --accent-soft: rgba(62, 207, 142, 0.16);
+  
+  --accent-mint: #3ecf8e;
+  --accent-amber: #e8ad4a; 
+  --accent-rose: #ff6b78;  
+  
+  --shadow-panel: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow for light mode cards */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
 
   /* Progress bar palette */
-  --progress-high: #FF808B;
-  --progress-primary: #5E81F4;
-  --progress-low: #7CE7AC;
+  --progress-high: #ff6b78;
+  --progress-primary: #3ecf8e;
+  --progress-low: #3ecf8e;
 
   /* Tag palette */
-  --tag-green-bg: rgba(124, 231, 172, 0.16);
-  --tag-green-text: #2DB77B;
-  --tag-yellow-bg: rgba(244, 190, 94, 0.16);
-  --tag-yellow-text: #C49332;
+  --tag-green-bg: rgba(62, 207, 142, 0.16);
+  --tag-green-text: #2db77b;
+  --tag-yellow-bg: rgba(232, 173, 74, 0.16);
+  --tag-yellow-text: #c49332;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #101014;
-    --background-strong: #18181C;
-    --foreground: #EAEAF0;
-    --foreground-soft: #C5C5D0;
-    --muted: #6B6B8A;
-    --border: #2A2A34;
-    --panel: #1A1A22;
-    --panel-strong: #1E1E28;
-    --panel-soft: #222230;
-    --accent: #7B96F8;
-    --accent-strong: #5E81F4;
-    --accent-soft: rgba(94, 129, 244, 0.14);
-    --accent-mint: #5DD89A;
-    --accent-amber: #E8AD4A;
-    --accent-rose: #FF6B78;
-    --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.32);
-    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.24);
-    --progress-high: #FF6B78;
-    --progress-primary: #7B96F8;
-    --progress-low: #5DD89A;
-    --tag-green-bg: rgba(93, 216, 154, 0.14);
-    --tag-green-text: #5DD89A;
-    --tag-yellow-bg: rgba(232, 173, 74, 0.14);
-    --tag-yellow-text: #E8AD4A;
+    /* Supabase Dark Emerald Theme */
+    --background: #171717;
+    --background-strong: #0f0f0f;
+    --foreground: #fafafa;
+    --foreground-soft: #b4b4b4;
+    --muted: #898989;
+    
+    --border: #2e2e2e;
+    --border-subtle: #242424;
+    --border-strong: #363636;
+    
+    --panel: #171717;
+    --panel-strong: #171717;
+    --panel-soft: #2e2e2e;
+    
+    --btn-primary-bg: #0f0f0f;
+    --btn-primary-text: #fafafa;
+
+    --accent: #3ecf8e;
+    --accent-strong: #00c573;
+    --accent-soft: rgba(62, 207, 142, 0.3);
+    
+    --accent-mint: #3ecf8e;
+    --accent-amber: #e8ad4a;
+    --accent-rose: #ff6b78;
+    
+    --shadow-panel: none;
+    --shadow-card: none;
+    --progress-high: #ff6b78;
+    --progress-primary: #3ecf8e;
+    --progress-low: #3ecf8e;
+    --tag-green-bg: rgba(62, 207, 142, 0.16);
+    --tag-green-text: #3ecf8e;
+    --tag-yellow-bg: rgba(232, 173, 74, 0.16);
+    --tag-yellow-text: #e8ad4a;
   }
 }
 
